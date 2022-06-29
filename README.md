@@ -34,34 +34,34 @@ During the whiteboarding session, users join a workspace and the state of each u
 
     The core of the application is real-time interaction, specifically real-time collaboration both through the whiteboarding and audio and video calling features. To enable these features, we will use [WebRTC](https://developer.mozilla.org/en-US/docs/Web/API/WebRTC_API), coupled with [fabricjs](https://github.com/fabricjs/fabric.js), an HTML5 Canvas library to enable drawing and drag-and-drop components. The features we plan to implement include the following:
 
-* Group video and audio calls with WebRTC. This adds complexity as it requires many-to-many connections rather than simpler peer-to-peer communication. We will make use of the Selective Forwarding Unit (SFU) architecture so that each participant sends and receives their media streams from a centralized server. A breakdown of other architectures can be found [here](https://www.callstats.io/blog/webrtc-architectures-explained-in-5-minutes-or-less). 
-* To keep track of and display each user’s cursor location on the screen, as well as broadcast the drawing on one user’s screen to the others’ through the shared canvas, we plan to use [socket.io](https://socket.io/) coupled with WebRTC. 
+    * Group video and audio calls with WebRTC. This adds complexity as it requires many-to-many connections rather than simpler peer-to-peer communication. We will make use of the Selective Forwarding Unit (SFU) architecture so that each participant sends and receives their media streams from a centralized server. A breakdown of other architectures can be found [here](https://www.callstats.io/blog/webrtc-architectures-explained-in-5-minutes-or-less). 
+    * To keep track of and display each user’s cursor location on the screen, as well as broadcast the drawing on one user’s screen to the others’ through the shared canvas, we plan to use [socket.io](https://socket.io/) coupled with WebRTC. 
 
 2. **OAuth 2.0 Client**
 
-We are going to use LinkedIn as our OAuth provider. The list of features we are planning to implement are provided below.
+    We are going to use LinkedIn as our OAuth provider. The list of features we are planning to implement are provided below.
 
-* During sign-up, retrieve the account details (name, date of birth, email, picture, etc.) from the provider and prepopulate the sign-up form, where the user has an option to make modifications if desired.
-* Retrieve the users’ connections, display them along with their names, and pictures, and allow the user to send an invitation to selected connections to join the whiteboard room via a LinkedIn message.
-* Send a connection invite to users who are in the same whiteboard room and are authenticated via LinkedIn.
-* Make a post on the user’s LinkedIn, containing a copy of the exported version of the whiteboard and a custom message.
+    * During sign-up, retrieve the account details (name, date of birth, email, picture, etc.) from the provider and prepopulate the sign-up form, where the user has an option to make modifications if desired.
+    * Retrieve the users’ connections, display them along with their names, and pictures, and allow the user to send an invitation to selected connections to join the whiteboard room via a LinkedIn message.
+    * Send a connection invite to users who are in the same whiteboard room and are authenticated via LinkedIn.
+    * Make a post on the user’s LinkedIn, containing a copy of the exported version of the whiteboard and a custom message.
 
 3. **Workers**
 
-We plan to use web workers in Node.js to run scripts in the background, for the following applications:
+    We plan to use web workers in Node.js to run scripts in the background, for the following applications:
 
-* Generate information about the video call as it progresses, such as the live transcript.
-* Send emails containing video call summaries with the information that is relevant to the recipient, once the call has completed.
-    * For the host, this would include call duration, participant information, and the transcript.
-    * For participants, this would include a link to a snapshot of the final drawing.
+    * Generate information about the video call as it progresses, such as the live transcript.
+    * Send emails containing video call summaries with the information that is relevant to the recipient, once the call has completed.
+        * For the host, this would include call duration, participant information, and the transcript.
+        * For participants, this would include a link to a snapshot of the final drawing.
 
 4. **Integration with Cloud Technologies**
 
-The cloud provider that we will incorporate services from is Google. The features that we hope to implement are described below: 
+    The cloud provider that we will incorporate services from is Google. The features that we hope to implement are described below: 
 
-* Generate a transcript of the video call using Google Cloud speech-to-text. This will be stored and sent in the video summary after the call’s completion.
-* Store completed drawings as files in Google Cloud storage.
-* Provide users with an option to convert their drawn words into text elements, using the Google Cloud Vision API to perform optical character recognition.
+    * Generate a transcript of the video call using Google Cloud speech-to-text. This will be stored and sent in the video summary after the call’s completion.
+    * Store completed drawings as files in Google Cloud storage.
+    * Provide users with an option to convert their drawn words into text elements, using the Google Cloud Vision API to perform optical character recognition.
 
 
 **Key Features (Beta)**
