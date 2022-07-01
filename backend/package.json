@@ -1,15 +1,16 @@
 {
   "name": "backend",
   "version": "1.0.0",
-  "description": "",
-  "main": "index.js",
+  "private": true,
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "start-dev": "node ./app.js",
+    "start": "node ./app.js"
   },
-  "keywords": [],
-  "author": "",
-  "license": "ISC",
   "dependencies": {
-    "express": "^4.18.1"
+    "express": "~4.16.0",
+    "nodemon": "^1.19.4"
+  },
+  "devDependencies": {
+    "nodemon": "^1.19.4"
   }
 }
