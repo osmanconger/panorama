@@ -1,20 +1,26 @@
 import React, { useState } from "react";
 import "./App.css";
+import Worker from './components/worker';
+import WorkerBuilder from './components/WorkerBuilder';
 
 
 function App() {
 
   const [status, setStatus] = useState('');
   const [email, setEmail] = useState('');
+  const [timeSent, setTime] = useState('');
 
-  const runWorker = (email, message) => {
+  const runWorker = (toEmail, message) => {
     setStatus('pending');
-    const worker = new window.Worker('./components/worker.js');
+    const worker = new WorkerBuilder(Worker);
 
-    worker.postMessage('email sending');
+    worker.postMessage({toEmail, message});
     worker.onerror = (err) => err;
     worker.onmessage = (e) => {
-      // send email here
+      const {success, time} = e.data;
+      console.log(e.data);
+      setStatus(success);
+      setTime(time);
       worker.terminate();
     };
   };
@@ -24,7 +30,7 @@ function App() {
   return (
     <div className="App">
       <h1>Panorama</h1>
-      <p>The email sent to {email} is {status}.</p>
+      <p>The email sent to {email} is {status}. Time: {timeSent} </p>
       <input 
         type="text" 
         id = "email"
