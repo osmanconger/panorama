@@ -1,10 +1,49 @@
 const express = require("express");
-const app = express();
+const http = require("http");
+const uuid = require("uuid");
+const mediasoup = require("mediasoup");
+const { Server } = require("socket.io");
 const port = 5000;
-app.get("/", (req, res) => {
-  res.send("Hello World!");
+
+const app = express();
+const server = http.createServer(app);
+//Required for CORS policy
+const io = new Server(server, {
+  cors: {
+    origin: "http://localhost:3000",
+    methods: ["GET", "POST", "PUT", "DELETE"],
+  },
 });
 
-app.listen(port, () => {
+//Again required for CORS
+app.use(function (req, res, next) {
+  res.header("Access-Control-Allow-Origin", "http://localhost:3000");
+  next();
+});
+
+//Listen for connections
+io.on("connection", (socket) => {
+  console.log("a user connected", socket.id);
+});
+
+const createWorker = () => {
+  return mediasoup.createWorker().then((worker) => {
+    return worker;
+  });
+};
+
+//Generate new room ID
+app.get("/api/create-room", (req, res) => {
+  const roomId = uuid.v4();
+  res.json({ roomId: roomId });
+});
+
+//TODO: Actually create room in create-room and verify room info here;
+//Get room information
+app.get("/api/:roomId", (req, res) => {
+  res.json({ roomId: req.params.roomId });
+});
+
+server.listen(port, () => {
   console.log(`Listening at http://localhost:${port}`);
 });
