@@ -10,6 +10,17 @@ app.use(bodyParser.json());
 
 const dotenv = require("dotenv").config();
 
+//Again required for CORS
+app.use(function (req, res, next) {
+  res.header("Access-Control-Allow-Origin", "http://localhost:3000");
+  res.header("Access-Control-Allow-Headers", "Content-Type");
+  next();
+});
+
+app.use(function (req, res, next) {
+  console.log("HTTP request", req.username, req.method, req.url, req.body);
+  next();
+});
 
 const port = 5000;
 app.get("/", (req, res) => {
@@ -31,11 +42,12 @@ const transporter = nodemailer.createTransport({
   secure: true, // upgrades later with STARTTLS -- change this based on the PORT
 });
 
-app.post('/text-mail', function (req, res, next) {
-  const {to, subject } = req.body;
+app.post('/api/text-mail', function (req, res, next) {
+  const {email, subject } = req.body;
+  console.log(email);
   const mailData = {
       from: process.env.EMAIL,
-      to: to,
+      to: email,
       subject: subject,
       html: '<b>Hey there! </b><br> This is our first message sent with Nodemailer<br/>',
   };
