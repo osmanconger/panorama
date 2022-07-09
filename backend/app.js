@@ -1,12 +1,13 @@
 const express = require("express");
 const http = require("http");
 const uuid = require("uuid");
-const mediasoup = require("mediasoup");
+// const mediasoup = require("mediasoup");
 const { Server } = require("socket.io");
 const port = 5000;
 
 const app = express();
 const server = http.createServer(app);
+
 //Required for CORS policy
 const io = new Server(server, {
   cors: {
@@ -23,14 +24,18 @@ app.use(function (req, res, next) {
 
 //Listen for connections
 io.on("connection", (socket) => {
-  console.log("a user connected", socket.id);
-});
+  //sends message to sender only
+  socket.emit("joined", socket.id);
 
-const createWorker = () => {
-  return mediasoup.createWorker().then((worker) => {
-    return worker;
+  socket.on("disconnect", () => {
+    //sends message to all clients except sender
+    socket.broadcast.emit(`user with id ${socket.id} left the call`);
   });
-};
+
+  socket.on("joinRoom", ({ roomId }) => {
+    io.to(roomId).emit(`${socket.id} joined room ${roomId}`);
+  });
+});
 
 //Generate new room ID
 app.get("/api/create-room", (req, res) => {
@@ -38,7 +43,6 @@ app.get("/api/create-room", (req, res) => {
   res.json({ roomId: roomId });
 });
 
-//TODO: Actually create room in create-room and verify room info here;
 //Get room information
 app.get("/api/:roomId", (req, res) => {
   res.json({ roomId: req.params.roomId });
