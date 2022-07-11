@@ -1,0 +1,19 @@
+name: remote ssh deployment
+on:
+  workflow_run:
+    workflows: ["build frontend", "build backend"]
+    types:
+      - completed
+jobs:
+  build:
+    name: Build
+    runs-on: ubuntu-latest
+    steps:
+      - name: deploy
+        uses: appleboy/ssh-action@master
+        with:
+          host: ${{ secrets.HOST }}
+          username: ${{ secrets.USERNAME }}
+          key: ${{ secrets.KEY }}
+          passphrase: ${{ secrets.PASS_PHRASE }}
+          script: echo "hello" > test.txt
