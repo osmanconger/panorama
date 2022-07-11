@@ -1,4 +1,4 @@
-.room {
+.form {
   display: flex;
   flex-direction: column;
   justify-content: center;
@@ -6,8 +6,6 @@
   padding: 20px;
 }
 
-.video {
-  width: 40%;
-  background-color: blue;
-  height: 500px;
+.form > * {
+  margin-bottom: 10px;
 }

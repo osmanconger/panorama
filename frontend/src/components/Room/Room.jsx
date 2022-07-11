@@ -1,43 +1,40 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import "./Room.css";
+import Participant from "../Participant/Participant";
 
-function Room() {
-  const [localStream, setLocalStream] = useState("");
-  //Start local stream to share video and audio
-  //TODO: Error handling
-  const getLocalStream = () => {
-    navigator.mediaDevices
-      .getUserMedia({
-        video: true,
-        audio: true,
-      })
-      .then((stream) => {
-        //TODO: Find better way to do this, possibly using state?
-        document.querySelector("#local-video").srcObject = stream;
-        setLocalStream(stream);
-      })
-      .catch((err) => console.log(err));
-  };
+const Room = ({ id, room }) => {
+  const [remoteParticipants, setRemoteParticipants] = useState([]);
 
-  const stopLocalStream = () => {
-    localStream
-      .getTracks()
-      .forEach((track) => track.readyState === "live" && track.stop());
-    setLocalStream("");
-  };
+  useEffect(() => {
+    const addParticipant = (p) => {
+      console.log(p);
+      setRemoteParticipants((prev) => [...prev, p]);
+    };
 
+    const removeParticipant = (participant) => {
+      setRemoteParticipants((prev) => prev.filter((p) => p !== participant));
+    };
+
+    room.remoteParticipants.forEach(addParticipant);
+    room.on("participantConnected", addParticipant);
+    room.on("participantDisconnected", removeParticipant);
+  }, [room]);
   return (
-    <div className="room">
-      <video className="video" id="local-video" autoPlay></video>
-      <br />
-      {localStream === "" && (
-        <button onClick={getLocalStream}>Share Your Video and Audio</button>
-      )}
-      {localStream !== "" && (
-        <button onClick={stopLocalStream}>Stop Sharing Video and Audio</button>
+    <div className="room page">
+      {room && (
+        <div>
+          <p>RoomId: {id}</p>
+          <div id="local-user">
+            <Participant participant={room.localParticipant} />
+          </div>
+          {remoteParticipants.map((participant) => (
+            <Participant key={participant.sid} participant={participant} />
+          ))}
+          {/* <button onClick={() => leaveRoom()}>Leave Room</button> */}
+        </div>
       )}
     </div>
   );
-}
+};
 
 export default Room;
