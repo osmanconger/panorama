@@ -16,4 +16,6 @@ jobs:
           username: ${{ secrets.USERNAME }}
           key: ${{ secrets.KEY }}
           passphrase: ${{ secrets.PASS_PHRASE }}
-          script: echo "hello" > test.txt
+          script: |
+            cd deployment
+            docker-compose -f docker-compose.prod.yml pull && docker-compose -f docker-compose.prod.yml up -d
