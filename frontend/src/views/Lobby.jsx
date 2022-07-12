@@ -7,24 +7,22 @@ import "./Lobby.css";
 
 const Lobby = () => {
   //set default type to join room, instead of creating a room
-  // const [type, setType] = useState("join");
-
   const [type, setType] = useState("join");
 
-  const handleAlignment = (e) => {
+  const changeType = (e) => {
     setType(e.target.value);
   };
 
   return (
-    <div className="lobby">
+    <div className="lobby page">
       <ToggleButtonGroup
         color="primary"
         value={type}
         exclusive
-        onChange={handleAlignment}
+        onChange={changeType}
       >
-        <ToggleButton value="create">Create Room</ToggleButton>
         <ToggleButton value="join">Join Room</ToggleButton>
+        <ToggleButton value="create">Create Room</ToggleButton>
       </ToggleButtonGroup>
       {type === "create" ? <CreateRoom /> : <JoinRoom />}
     </div>

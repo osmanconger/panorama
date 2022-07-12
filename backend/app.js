@@ -5,18 +5,16 @@ const getVideoToken = require("./generate-token");
 const bodyParser = require("body-parser");
 const port = 5000;
 
+const env = require("dotenv").config();
+const client = require("twilio")(
+  process.env.TWILIO_ACCOUNT_SID,
+  process.env.TWILIO_AUTH_TOKEN
+);
+
 const app = express();
 const server = http.createServer(app);
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(bodyParser.json());
-
-// //Required for CORS policy
-// const io = new Server(server, {
-//   cors: {
-//     origin: "http://localhost:3000",
-//     methods: ["GET", "POST", "PUT", "DELETE"],
-//   },
-// });
 
 //Again required for CORS
 app.use(function (req, res, next) {
@@ -25,29 +23,6 @@ app.use(function (req, res, next) {
   next();
 });
 
-// //Listen for connections
-// io.on("connection", (socket) => {
-//   //sends message to sender only
-//   console.log(socket.id);
-//   socket.emit("connected", socket.id);
-
-//   socket.on("disconnect", () => {
-//     //sends message to all clients except sender
-//     socket.broadcast.emit(`user with id ${socket.id} left the call`);
-//   });
-
-//   socket.on("joinedRoom", ({ roomId }) => {
-//     io.to(roomId).emit(`${socket.id} joined room ${roomId}`);
-//   });
-// });
-
-// app.get("/api/token", (req, res) => {
-//   const identity = req.body.identity;
-//   const room = req.body.room;
-//   const token = getVideoToken(identity, room);
-//   res.send(JSON.stringify({ token: token }));
-// });
-
 app.post("/api/token", (req, res) => {
   const identity = req.body.identity;
   const room = req.body.room;
@@ -55,10 +30,20 @@ app.post("/api/token", (req, res) => {
   res.send(JSON.stringify({ token: token }));
 });
 
-//Create a new room, return the room token
+// // //TODO: Check if room instance already exists
+// app.get("/api/room/:roomId", (req, res) => {
+//   client.video.v1
+//     .rooms(req.params.roomId)
+//     .fetch()
+//     .then((room) => console.log(room))
+//     .catch((err) => {
+//       res.status(404).send(JSON.stringify({ err: "Room not found" }));
+//     });
+// });
+
+//Create a new room, return the room token and id
 app.post("/api/room", (req, res) => {
   const roomId = uuid.v4();
-  res.json({ roomId: roomId });
   const identity = req.body.identity;
   const room = roomId;
   const token = getVideoToken(identity, room);

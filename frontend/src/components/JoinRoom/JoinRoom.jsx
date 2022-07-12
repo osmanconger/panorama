@@ -1,19 +1,21 @@
 import { useState } from "react";
 import { Button, TextField } from "@mui/material";
+import { connect } from "twilio-video";
 
 import "../Form.css";
 import Room from "../Room/Room";
 
 const JoinRoom = () => {
-  const { connect } = require("twilio-video");
-
   const [roomId, setRoomId] = useState("");
   const [room, setRoom] = useState(null);
   const [name, setName] = useState("");
-  const [token, setToken] = useState(null);
 
   const joinRoom = (e) => {
     e.preventDefault();
+    // fetch(`http://localhost:5000/api/room/${roomId}`).then((res) =>
+    //   console.log(res)
+    // );
+    //TODO: Check for existing room
     fetch(`http://localhost:5000/api/token`, {
       method: "POST",
       headers: {
@@ -28,7 +30,6 @@ const JoinRoom = () => {
         return res.json();
       })
       .then((json) => {
-        setToken(json.token);
         connect(json.token, { name: roomId }).then((room) => setRoom(room));
       })
       .catch((err) => console.log(err));
@@ -36,7 +37,6 @@ const JoinRoom = () => {
 
   return (
     <div>
-      {/* TODO: Change this obviously, we need some global state for the token so that Room can get passed the necessary token and is not a component here*/}
       {!room ? (
         <form onSubmit={joinRoom} className="form">
           <TextField
@@ -58,7 +58,7 @@ const JoinRoom = () => {
           </Button>
         </form>
       ) : (
-        <Room room={room} id={roomId} token={token} />
+        <Room room={room} id={roomId} />
       )}
     </div>
   );

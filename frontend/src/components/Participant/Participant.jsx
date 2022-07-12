@@ -54,7 +54,7 @@ const Participant = ({ participant }) => {
     <div>
       <h3>{participant.identity}</h3>
       <video ref={videoRef} autoPlay playsInline />
-      <audio ref={audioRef} autoPlay muted />
+      <audio ref={audioRef} autoPlay />
     </div>
   );
 };
