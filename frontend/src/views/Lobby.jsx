@@ -9,7 +9,6 @@ import "./Lobby.css";
 
 const Lobby = () => {
   const { user } = useContext(AuthContext);
-  console.log(user);
 
   //set default type to join room, instead of creating a room
   const [type, setType] = useState("join");

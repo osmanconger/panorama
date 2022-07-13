@@ -68,8 +68,8 @@ const CreateRoom = () => {
             </Button>
           </>
         )}
-        {room && <Room room={room} id={roomId} />}
       </form>
+      {room && <Room room={room} id={roomId} />}
     </div>
   );
 };

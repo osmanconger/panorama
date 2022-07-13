@@ -3,10 +3,12 @@ import { Button } from "@mui/material";
 
 import "./Room.css";
 import Participant from "../Participant/Participant";
-import Whiteboard from "../Whiteboard/Whiteboard";
 
 const Room = ({ room, id }) => {
   const [remoteParticipants, setRemoteParticipants] = useState([]);
+  //audioOn set to true means unmuted
+  const [audioOn, setAudioOn] = useState(true);
+  const [videoOn, setVideoOn] = useState(true);
 
   useEffect(() => {
     const addParticipant = (participant) => {
@@ -27,6 +29,35 @@ const Room = ({ room, id }) => {
       window.addEventListener("beforeunload", () => room.disconnect());
     }
   }, [room]);
+
+  const mute = () => {
+    room.localParticipant.audioTracks.forEach((publication) =>
+      publication.track.disable()
+    );
+    setAudioOn(false);
+  };
+
+  const unmute = () => {
+    room.localParticipant.audioTracks.forEach((publication) =>
+      publication.track.enable()
+    );
+    setAudioOn(true);
+  };
+
+  const startVideo = () => {
+    room.localParticipant.videoTracks.forEach((publication) =>
+      publication.track.enable()
+    );
+    setVideoOn(true);
+  };
+
+  const stopVideo = () => {
+    room.localParticipant.videoTracks.forEach((publication) => {
+      publication.track.disable();
+      // publication.track.detach();
+    });
+    setVideoOn(false);
+  };
 
   return (
     <div className="room page">
@@ -56,11 +87,29 @@ const Room = ({ room, id }) => {
             {/* <Whiteboard roomId={id} /> */}
           </div>
           <div className="controls">
-            <i className="fa-solid fa-microphone"></i>
+            {audioOn ? (
+              <Button variant="outlined" onClick={() => mute()}>
+                Mute
+              </Button>
+            ) : (
+              <Button variant="outlined" onClick={() => unmute()}>
+                Unmute
+              </Button>
+            )}
+            {videoOn ? (
+              <Button variant="outlined" onClick={() => stopVideo()}>
+                Turn Video Off
+              </Button>
+            ) : (
+              <Button variant="outlined" onClick={() => startVideo()}>
+                Turn Video On
+              </Button>
+            )}
+            {/* <i className="fa-solid fa-microphone"></i>
             <i className="fa-solid fa-microphone-slash"></i>
             <i className="fa-solid fa-video"></i>
             <i className="fa-solid fa-video-slash"></i>
-            <i className="fa-solid fa-phone-xmark"></i>
+            <i className="fa-solid fa-phone-xmark"></i> */}
             {/* TODO: Only show this option if you are the host */}
             <Button variant="outlined" color="error">
               End Call
