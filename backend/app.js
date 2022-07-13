@@ -1,26 +1,15 @@
 const express = require("express");
 const http = require("http");
-const uuid = require("uuid");
-//const mediasoup = require("mediasoup");
-const cookie = require("cookie");
 const bcrypt = require("bcrypt");
 const dotenv = require("dotenv").config();
 const session = require("express-session");
 
-const { Server } = require("socket.io");
 const port = 5000;
 
 const app = express();
 app.use(express.json());
 
 const server = http.createServer(app);
-//Required for CORS policy
-const io = new Server(server, {
-  cors: {
-    origin: "http://localhost:3000",
-    methods: ["GET", "POST", "PUT", "DELETE"],
-  },
-});
 
 //Again required for CORS
 app.use(function (req, res, next) {
@@ -29,28 +18,6 @@ app.use(function (req, res, next) {
   next();
 });
 
-//Listen for connections
-io.on("connection", (socket) => {
-  console.log("a user connected", socket.id);
-});
-/*
-const createWorker = () => {
-  return mediasoup.createWorker().then((worker) => {
-    return worker;
-  });
-};*/
-
-//Generate new room ID
-app.get("/api/create-room", (req, res) => {
-  const roomId = uuid.v4();
-  res.json({ roomId: roomId });
-});
-
-//TODO: Actually create room in create-room and verify room info here;
-//Get room information
-app.get("/api/:roomId", (req, res) => {
-  res.json({ roomId: req.params.roomId });
-});
 
 // database stuff
 const mongoose = require("mongoose");
@@ -89,7 +56,7 @@ app.post("/api/signup/", function (req, res, next) {
   if (!("username" in req.body))
     return res.status(400).end("username is missing");
   if (!("password" in req.body))
-    return res.status(400).end("password is missing");
+    return res.status(400).end("password is missing"); // to do: all errors in .json
 
   let uname = req.body.username;
   let password = req.body.password;
@@ -108,14 +75,6 @@ app.post("/api/signup/", function (req, res, next) {
         { username: uname, password: hash },
         function (err2, userCreated) {
           if (err2) return res.status(500).end(err2);
-          // initialize cookie
-          res.setHeader(
-            "Set-Cookie",
-            cookie.serialize("username", uname, {
-              path: "/",
-              maxAge: 60 * 60 * 24 * 7,
-            })
-          );
           req.session.user = userCreated;
           return res.json(uname);
         }
@@ -131,29 +90,23 @@ app.post("/api/login", (req, res) => {
     if (!("password" in req.body))
       return res.status(400).end("password is missing");
   
-    let username = req.body.username;
+    let uname = req.body.username;
     let password = req.body.password;
-    return res.json(username);
-   /*// retrieve user from the database
-    users.findOne({ _id: username }, function (err, user) {
+
+       // retrieve user from the database
+    users.findOne({ username: uname }, function (err, user) {
       if (err) return res.status(500).end(err);
       if (!user) return res.status(401).end("access denied");
       let hash = user.password;
       bcrypt.compare(password, hash, function (err, result) {
         if (!result) return res.status(401).end("access denied");
-        // initialize cookie
-        res.setHeader(
-          "Set-Cookie",
-          cookie.serialize("username", user._id, {
-            path: "/",
-            maxAge: 60 * 60 * 24 * 7,
-          })
-        );
         req.session.user = user;
         return res.json(username);
       });
-    });*/
-  });
+    });
+
+    return res.json(username);
+});
 
 
 server.listen(port, () => {

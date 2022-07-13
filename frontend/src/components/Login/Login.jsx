@@ -43,12 +43,10 @@ function Login() {
         <div className="input-container">
           <label>Username </label>
           <input type="text" name="username" required onChange={e => setUser(e.target.value)} />
-          {renderErrorMessage("incorrect credentials")}
         </div>
         <div className="input-container">
           <label>Password </label>
           <input type="password" name="pass" required onChange={e => setPass(e.target.value)}  />
-          {renderErrorMessage("incorrect credentials")}
         </div>
         <div className="button-container">
           <input type="submit" />

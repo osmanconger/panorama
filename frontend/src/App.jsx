@@ -9,20 +9,11 @@ import Login from "./components/Login/Login";
 import Signup from "./components/Signup/Signup";
 
 function App() {
-  const [res, setRes] = useState("");
-  const endpoint = "http://localhost:5000";
 
-  useEffect(() => {
-    const socket = io(endpoint);
-    socket.on("connection-success", (socket) => {
-      console.log(socket.id);
-      setRes(socket.id);
-    });
-  }, []);
   return (
     <BrowserRouter>
       <div className="App">
-        <h1>Panorama {res}</h1>
+        <h1>Panorama</h1>
       </div>
       <Routes>
         <Route path="/:roomId" element={<Room />} />
