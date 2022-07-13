@@ -3,6 +3,7 @@ import { Button } from "@mui/material";
 
 import "./Room.css";
 import Participant from "../Participant/Participant";
+import Whiteboard from "../Whiteboard/Whiteboard";
 
 const Room = ({ room, id }) => {
   const [remoteParticipants, setRemoteParticipants] = useState([]);
@@ -52,13 +53,14 @@ const Room = ({ room, id }) => {
             {remoteParticipants.map((participant) => (
               <Participant key={participant.sid} participant={participant} />
             ))}
+            {/* <Whiteboard roomId={id} /> */}
           </div>
           <div className="controls">
-            <i class="fa-solid fa-microphone"></i>
-            <i class="fa-solid fa-microphone-slash"></i>
-            <i class="fa-solid fa-video"></i>
-            <i class="fa-solid fa-video-slash"></i>
-            <i class="fa-solid fa-phone-xmark"></i>
+            <i className="fa-solid fa-microphone"></i>
+            <i className="fa-solid fa-microphone-slash"></i>
+            <i className="fa-solid fa-video"></i>
+            <i className="fa-solid fa-video-slash"></i>
+            <i className="fa-solid fa-phone-xmark"></i>
             {/* TODO: Only show this option if you are the host */}
             <Button variant="outlined" color="error">
               End Call
