@@ -1,43 +1,73 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import { Button } from "@mui/material";
+
 import "./Room.css";
+import Participant from "../Participant/Participant";
 
-function Room() {
-  const [localStream, setLocalStream] = useState("");
-  //Start local stream to share video and audio
-  //TODO: Error handling
-  const getLocalStream = () => {
-    navigator.mediaDevices
-      .getUserMedia({
-        video: true,
-        audio: true,
-      })
-      .then((stream) => {
-        //TODO: Find better way to do this, possibly using state?
-        document.querySelector("#local-video").srcObject = stream;
-        setLocalStream(stream);
-      })
-      .catch((err) => console.log(err));
-  };
+const Room = ({ room, id }) => {
+  const [remoteParticipants, setRemoteParticipants] = useState([]);
 
-  const stopLocalStream = () => {
-    localStream
-      .getTracks()
-      .forEach((track) => track.readyState === "live" && track.stop());
-    setLocalStream("");
-  };
+  useEffect(() => {
+    const addParticipant = (participant) => {
+      setRemoteParticipants((prev) => [...prev, participant]);
+    };
+
+    const removeParticipant = (participant) => {
+      participant.removeAllListeners();
+      setRemoteParticipants((prev) => prev.filter((p) => p !== participant));
+    };
+
+    if (room) {
+      room.participants.forEach(addParticipant);
+      room.on("participantConnected", addParticipant);
+      room.on("participantDisconnected", removeParticipant);
+      //local participant disconnects
+      window.addEventListener("pagehide", () => room.disconnect());
+      window.addEventListener("beforeunload", () => room.disconnect());
+    }
+  }, [room]);
 
   return (
-    <div className="room">
-      <video className="video" id="local-video" autoPlay></video>
-      <br />
-      {localStream === "" && (
-        <button onClick={getLocalStream}>Share Your Video and Audio</button>
-      )}
-      {localStream !== "" && (
-        <button onClick={stopLocalStream}>Stop Sharing Video and Audio</button>
+    <div className="room page">
+      {room && (
+        <div>
+          <div className="room-invite">
+            <p>
+              <b>RoomId :</b> {id}
+            </p>
+            <Button
+              variant="outlined"
+              size="small"
+              onClick={() => {
+                navigator.clipboard.writeText(id);
+              }}
+            >
+              Copy Room Id
+            </Button>
+          </div>
+          <div className="videos-container">
+            <div id="local-user">
+              <Participant participant={room.localParticipant} />
+            </div>
+            {remoteParticipants.map((participant) => (
+              <Participant key={participant.sid} participant={participant} />
+            ))}
+          </div>
+          <div className="controls">
+            <i class="fa-solid fa-microphone"></i>
+            <i class="fa-solid fa-microphone-slash"></i>
+            <i class="fa-solid fa-video"></i>
+            <i class="fa-solid fa-video-slash"></i>
+            <i class="fa-solid fa-phone-xmark"></i>
+            {/* TODO: Only show this option if you are the host */}
+            <Button variant="outlined" color="error">
+              End Call
+            </Button>
+          </div>
+        </div>
       )}
     </div>
   );
-}
+};
 
 export default Room;
