@@ -2,19 +2,16 @@ import "./App.css";
 import { BrowserRouter, Route, Routes } from "react-router-dom";
 import Room from "./components/Room/Room";
 import Lobby from "./views/Lobby";
+import Login from "./components/Login/Login";
+import Signup from "./components/Signup/Signup";
 
 function App() {
-  // //access token to room
-  // const [room, setRoom] = useState(null);
-
-  // const updateRoom = (room) => {
-  //   setRoom(room);
-  // };
-
   return (
     <BrowserRouter>
       <Routes>
-        {/* <Route path="/:roomId" element={<Room room={room} />} /> */}
+        <Route path="/:roomId" element={<Room />} />
+        <Route path="/login" element={<Login />} />
+        <Route path="/signup" element={<Signup />} />
         <Route path="/" element={<Lobby />} />
       </Routes>
     </BrowserRouter>

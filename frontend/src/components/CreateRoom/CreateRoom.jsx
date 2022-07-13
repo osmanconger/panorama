@@ -3,11 +3,12 @@ import { connect } from "twilio-video";
 
 import Room from "../Room/Room";
 
-import { useState } from "react";
+import { useContext, useState } from "react";
 import "../Form.css";
+import { AuthContext } from "../../context/AuthProvider";
 
 const CreateRoom = () => {
-  const [hostName, setHostName] = useState("");
+  const { user } = useContext(AuthContext);
   const [roomId, setRoomId] = useState(null);
   const [token, setToken] = useState(null);
   const [room, setRoom] = useState(null);
@@ -20,7 +21,7 @@ const CreateRoom = () => {
         "Content-Type": "application/json",
       },
       body: JSON.stringify({
-        identity: hostName,
+        identity: user.name,
       }),
     })
       .then((res) => {
@@ -53,13 +54,6 @@ const CreateRoom = () => {
       <form onSubmit={createRoom} className="form">
         {!room && !roomId && (
           <>
-            <TextField
-              required
-              variant="standard"
-              placeholder="Enter your name"
-              value={hostName}
-              onChange={(e) => setHostName(e.target.value)}
-            ></TextField>
             <br />
             <Button variant="outlined" type="submit">
               Generate a new room ID

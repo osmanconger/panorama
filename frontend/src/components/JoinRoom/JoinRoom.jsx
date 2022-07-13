@@ -1,14 +1,16 @@
-import { useState } from "react";
+import { useState, useContext } from "react";
 import { Button, TextField } from "@mui/material";
 import { connect } from "twilio-video";
+import { AuthContext } from "../../context/AuthProvider";
 
 import "../Form.css";
 import Room from "../Room/Room";
 
 const JoinRoom = () => {
+  const { user } = useContext(AuthContext);
   const [roomId, setRoomId] = useState("");
   const [room, setRoom] = useState(null);
-  const [name, setName] = useState("");
+  // const [name, setName] = useState("");
   const [errors, setErrors] = useState("");
 
   const joinRoom = (e) => {
@@ -22,7 +24,7 @@ const JoinRoom = () => {
             "Content-Type": "application/json",
           },
           body: JSON.stringify({
-            identity: name,
+            identity: user.name,
             room: roomId,
           }),
         })
@@ -43,12 +45,6 @@ const JoinRoom = () => {
     <div>
       {!room ? (
         <form onSubmit={joinRoom} className="form">
-          <TextField
-            variant="standard"
-            placeholder="Enter your name"
-            value={name}
-            onChange={(e) => setName(e.target.value)}
-          ></TextField>
           <br />
           <TextField
             variant="standard"
