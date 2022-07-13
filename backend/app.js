@@ -30,23 +30,30 @@ app.post("/api/token", (req, res) => {
   res.send(JSON.stringify({ token: token }));
 });
 
-// // //TODO: Check if room instance already exists
-// app.get("/api/room/:roomId", (req, res) => {
-//   client.video.v1
-//     .rooms(req.params.roomId)
-//     .fetch()
-//     .then((room) => console.log(room))
-//     .catch((err) => {
-//       res.status(404).send(JSON.stringify({ err: "Room not found" }));
-//     });
-// });
+//Check if room exists
+app.get("/api/room/:roomId", (req, res) => {
+  client.video.v1
+    .rooms(req.params.roomId)
+    .fetch()
+    .then((room) => res.status(200).send(JSON.stringify({ room: room })))
+    .catch(() => {
+      res.status(404).send(JSON.stringify({ err: "Room not found" }));
+    });
+});
 
-//Create a new room, return the room token and id
-app.post("/api/room", (req, res) => {
+//Get token to access existing room
+app.post("/api/room/:roomId/token", (req, res) => {
+  const roomId = req.params.roomId;
+  const identity = req.body.identity;
+  const token = getVideoToken(identity, roomId);
+  res.send(JSON.stringify({ token: token, id: roomId }));
+});
+
+//Create a new room, return the id and token to access the room
+app.post("/api/room/token", (req, res) => {
   const roomId = uuid.v4();
   const identity = req.body.identity;
-  const room = roomId;
-  const token = getVideoToken(identity, room);
+  const token = getVideoToken(identity, roomId);
   res.send(JSON.stringify({ token: token, id: roomId }));
 });
 

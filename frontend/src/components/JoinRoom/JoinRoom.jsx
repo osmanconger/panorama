@@ -9,30 +9,34 @@ const JoinRoom = () => {
   const [roomId, setRoomId] = useState("");
   const [room, setRoom] = useState(null);
   const [name, setName] = useState("");
+  const [errors, setErrors] = useState("");
 
   const joinRoom = (e) => {
     e.preventDefault();
-    // fetch(`http://localhost:5000/api/room/${roomId}`).then((res) =>
-    //   console.log(res)
-    // );
-    //TODO: Check for existing room
-    fetch(`http://localhost:5000/api/token`, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
-        identity: name,
-        room: roomId,
-      }),
-    })
-      .then((res) => {
-        return res.json();
-      })
-      .then((json) => {
-        connect(json.token, { name: roomId }).then((room) => setRoom(room));
-      })
-      .catch((err) => console.log(err));
+    fetch(`http://localhost:5000/api/room/${roomId}`).then((res) => {
+      //Connect to room if it exists
+      if (res.status === 200) {
+        fetch(`http://localhost:5000/api/token`, {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            identity: name,
+            room: roomId,
+          }),
+        })
+          .then((res) => {
+            return res.json();
+          })
+          .then((json) => {
+            connect(json.token, { name: roomId }).then((room) => setRoom(room));
+          })
+          .catch((err) => console.log(err));
+      } else {
+        setErrors("Room Not Found");
+      }
+    });
   };
 
   return (
@@ -56,6 +60,7 @@ const JoinRoom = () => {
           <Button variant="outlined" type="submit">
             Join Room
           </Button>
+          {errors && <p>{errors}</p>}
         </form>
       ) : (
         <Room room={room} id={roomId} />
