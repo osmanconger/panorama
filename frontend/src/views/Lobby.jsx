@@ -5,6 +5,7 @@ import { AuthContext } from "../context/AuthProvider";
 import JoinRoom from "../components/JoinRoom/JoinRoom";
 import CreateRoom from "../components/CreateRoom/CreateRoom";
 import Login from "../components/Login/Login";
+import Signup from "../components/Signup/Signup";
 import "./Lobby.css";
 
 const Lobby = () => {
@@ -12,12 +13,17 @@ const Lobby = () => {
 
   //set default type to join room, instead of creating a room
   const [type, setType] = useState("join");
+  const [loginType, setLoginType] = useState("signup");
 
   const [inRoom, setInRoom] = useState(false);
 
   const changeRoom = (val) => {
     setInRoom(val);
   };
+
+  const changeLoginType = (e) => {
+    setLoginType(e.target.value);
+  }
 
   return (
     <div>
@@ -42,7 +48,18 @@ const Lobby = () => {
           )}
         </div>
       ) : (
-        <Login />
+        <div className="lobby page">
+          <ToggleButtonGroup
+            color="primary"
+            value={loginType}
+            exclusive
+            onChange={changeLoginType}
+          >
+            <ToggleButton value="signup">Sign Up</ToggleButton>
+            <ToggleButton value="login">Log In</ToggleButton>
+          </ToggleButtonGroup>
+          {loginType === "signup" ? <Signup /> : <Login />}
+        </div>
       )}
     </div>
   );

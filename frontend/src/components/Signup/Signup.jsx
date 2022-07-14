@@ -1,4 +1,6 @@
 import React, { useEffect, useState } from "react";
+import { Button, TextField} from "@mui/material";
+import "../Form.css";
 
 function Signup() {
   const [errors, setErrors] = useState({});
@@ -49,33 +51,70 @@ function Signup() {
       <div className="error">{message}</div>
     );
 
-  // JSX code for login form
+  // JSX code for signup form
   const renderForm = (
-    <div className="form">
-      <form onSubmit={handleSubmit}>
-        <div className="input-container">
-          <label>Username </label>
-          <input type="text" name="username" required onChange={e => setUser(e.target.value)} />
-        </div>
-        <div className="input-container">
-          <label>Password </label>
-          <input type="password" name="pass" required onChange={e => setPass(e.target.value)}  />
-        </div>
-        <div className="input-container">
-          <label>Confirm Password </label>
-          <input type="password" name="pass2" required onChange={e => setPass2(e.target.value)}  />
-        </div>
-        <div className="button-container">
-          <input type="submit" />
-        </div>
+    <div>
+      <form onSubmit={handleSubmit} className = "form">
+        <TextField
+            variant="standard"
+            placeholder="Enter username"
+            value={user}
+            onChange={(e) => setUser(e.target.value)}
+        />
+        <br />
+        <TextField
+            variant="standard"
+            type="password"
+            placeholder="Enter password"
+            value={pass}
+            onChange={(e) => setPass(e.target.value)}
+        />
+        <br />
+        <TextField
+            variant="standard"
+            type="password"
+            placeholder="Confirm password"
+            value={pass2}
+            onChange={(e) => setPass2(e.target.value)}
+        />
+        <br />
+        <Button variant="outlined" type="submit">
+            Sign In
+        </Button>
       </form>
     </div>
   );
 
   return ( 
-    <div className="Signup">
-      <h1> Sign up for an account</h1>
-      {isSubmitted ? <div>User is successfully signed up</div> : renderForm}
+    <div>
+      <form onSubmit={handleSubmit} className = "form">
+        <TextField
+            variant="standard"
+            placeholder="Enter username"
+            value={user}
+            onChange={(e) => setUser(e.target.value)}
+        />
+        <br />
+        <TextField
+            variant="standard"
+            type="password"
+            placeholder="Enter password"
+            value={pass}
+            onChange={(e) => setPass(e.target.value)}
+        />
+        <br />
+        <TextField
+            variant="standard"
+            type="password"
+            placeholder="Confirm password"
+            value={pass2}
+            onChange={(e) => setPass2(e.target.value)}
+        />
+        <br />
+        <Button variant="outlined" type="submit">
+            Sign In
+        </Button>
+      </form>
     </div>
   );
 }

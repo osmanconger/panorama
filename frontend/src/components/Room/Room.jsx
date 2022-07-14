@@ -4,6 +4,7 @@ import { Mic, MicOff, Videocam, VideocamOff } from "@mui/icons-material";
 
 import "./Room.css";
 import Participant from "../Participant/Participant";
+import Whiteboard from "../Whiteboard/Whiteboard";
 
 const Room = ({ room, id, setRoom }) => {
   const [remoteParticipants, setRemoteParticipants] = useState([]);
@@ -106,7 +107,7 @@ const Room = ({ room, id, setRoom }) => {
                 />
               </div>
             ))}
-            {/* <Whiteboard roomId={id} /> */}
+             <Whiteboard roomId={id} /> 
           </div>
           <br />
           <br />
