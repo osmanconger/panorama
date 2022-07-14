@@ -12,6 +12,7 @@ const JoinRoom = ({ setInRoom }) => {
   const [room, setRoom] = useState(null);
   const [errors, setErrors] = useState("");
 
+  //passed to Room so that if the local participant leaves, this can be set to null, or vice versa
   const changeRoom = (room) => {
     setRoom(room);
   };

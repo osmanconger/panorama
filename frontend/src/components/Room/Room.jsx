@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
 import { Button, Grid } from "@mui/material";
+import { ToggleButtonGroup, ToggleButton } from "@mui/material";
 import { Mic, MicOff, Videocam, VideocamOff } from "@mui/icons-material";
 
 import "./Room.css";
@@ -7,6 +8,9 @@ import Participant from "../Participant/Participant";
 import Whiteboard from "../Whiteboard/Whiteboard";
 
 const Room = ({ room, id, setRoom }) => {
+  //the mode can either be "draw" or "vid" corresponding to seeing the whiteboard or video
+  const [mode, setMode] = useState("vid");
+
   const [remoteParticipants, setRemoteParticipants] = useState([]);
   //audioOn set to true means unmuted
   const [audioOn, setAudioOn] = useState(true);
@@ -89,26 +93,38 @@ const Room = ({ room, id, setRoom }) => {
               Copy Room Id
             </Button>
           </div>
-          <div className="videos-container">
-            <div className="participant" id="local-user">
-              <Participant
-                participant={room.localParticipant}
-                videoOn={videoOn}
-                audioOn={audioOn}
-              />
-            </div>
-            {remoteParticipants.map((participant) => (
-              <div className="participant">
+          <ToggleButtonGroup
+            color="primary"
+            value={mode}
+            exclusive
+            onChange={(e) => setMode(e.target.value)}
+          >
+            <ToggleButton value="vid">Videos</ToggleButton>
+            <ToggleButton value="draw">Whiteboard</ToggleButton>
+          </ToggleButtonGroup>
+          {mode === "vid" ? (
+            <div className="videos-container">
+              <div className="participant" id="local-user">
                 <Participant
-                  key={participant.sid}
-                  participant={participant}
-                  videoOn={true}
-                  audioOn={true}
+                  participant={room.localParticipant}
+                  videoOn={videoOn}
+                  audioOn={audioOn}
                 />
               </div>
-            ))}
-             <Whiteboard roomId={id} /> 
-          </div>
+              {remoteParticipants.map((participant) => (
+                <div className="participant">
+                  <Participant
+                    key={participant.sid}
+                    participant={participant}
+                    videoOn={true}
+                    audioOn={true}
+                  />
+                </div>
+              ))}
+            </div>
+          ) : (
+            <Whiteboard roomId={id} />
+          )}
           <br />
           <br />
           <div className="controls">
