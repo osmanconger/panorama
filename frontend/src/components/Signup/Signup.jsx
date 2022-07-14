@@ -7,7 +7,7 @@ function Signup() {
   const [isSubmitted, setSubmit] = useState(false);
   
   const [user, setUser] = useState("");
-  
+  const [email, setEmail] = useState("");
   const [pass, setPass] = useState("");
   const [pass2, setPass2] = useState("");
 
@@ -19,7 +19,7 @@ function Signup() {
       console.log("pass does not match");
       return;
     }
-    const creds = { username: user, password: pass };
+    const creds = { username: user, email: email, password: pass };
 
     // Fetch call to sign user in
     fetch(`http://localhost:5000/api/signup/`, {
@@ -39,6 +39,7 @@ function Signup() {
     })
     .then(data => {
       console.log('Success:', data);
+      alert("Successfully sign up. You may now log in.")
     })
     .catch((error) => {
       console.error('Error:', error);
@@ -94,6 +95,14 @@ function Signup() {
             value={user}
             onChange={(e) => setUser(e.target.value)}
         />
+        <br />
+        <TextField
+            variant="standard"
+            placeholder="Enter Email"
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
+        />
+        <br />
         <TextField
             variant="standard"
             type="password"
@@ -101,6 +110,7 @@ function Signup() {
             value={pass}
             onChange={(e) => setPass(e.target.value)}
         />
+        <br />
         <TextField
             variant="standard"
             type="password"
@@ -108,6 +118,7 @@ function Signup() {
             value={pass2}
             onChange={(e) => setPass2(e.target.value)}
         />
+        <br/>
         <Button variant="outlined" type="submit">
             Sign In
         </Button>
