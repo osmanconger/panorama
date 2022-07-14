@@ -4,9 +4,23 @@
   justify-content: center;
   align-items: center;
   padding: 20px;
+  width: 100%;
+  overflow-x: hidden;
 }
-.video {
-  width: 50%;
-  background-color: blue;
-  height: 20%;
+
+.room-invite {
+  display: flex;
+  column-gap: 1rem;
+}
+
+.videos-container {
+  width: 80%;
+  height: 90vh;
+  display: flex;
+}
+
+.controls {
+  display: flex;
+  column-gap: 1rem;
+  justify-content: center;
 }
