@@ -54,8 +54,11 @@ app.post("/api/token", (req, res) => {
   const token = getVideoToken(identity, room);
   rooms.findOne({ id: room }, function (err3, data) {
     if (data) {
-      data.participants.push(identity);
-      data.save();
+      users.findOne({username: identity}, function (err, user) {
+        data.participants.push(identity);
+        data.participantEmails.push(user.email);
+        data.save();
+      });
     }
     });
   res.send(JSON.stringify({ token: token }));
@@ -90,8 +93,11 @@ app.post("/api/room/token", (req, res) => {
   rooms.create({id: roomId},
     function (err2, createdRoom) {
       if (err2) return res.status(500).end(err2);
-      createdRoom.participants.push(identity);
-      createdRoom.save();
+      users.findOne({username: identity}, function (err, user) {
+        createdRoom.participants.push(identity);
+        createdRoom.participantEmails.push(user.email);
+        createdRoom.save();
+      });
     });
   res.send(JSON.stringify({ token: token, id: roomId }));
 });
@@ -176,8 +182,21 @@ app.post("/api/login", (req, res) => {
 
 // get room participants
 app.get("/api/room/:roomId/participants", (req, res) => {
-  
+  rooms.findOne( {id: req.params.roomId}, function (err, data) {
+    if (err) return res.status(500).end(err);
+    console.log(data.participants);
+    console.log(data.participantEmails);
+    return res.send(JSON.stringify({names: data.participants, emails: data.participantEmails}));
+  })
 });
+
+// get email of user
+/*app.post("/api/userEmail", (req, res) => {
+  users.findOne( {username: req.body.username}, function (err, data) {
+    if (err) return res.status(500).end(err);
+    return res.send(data.email);
+  })
+});*/
 
 // email stuff
 server.listen(port, () => {

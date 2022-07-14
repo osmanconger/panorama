@@ -8,6 +8,10 @@ const roomSchema = new mongoose.Schema({
     participants: {
       "default": [],
       type: Array
+    },
+    participantEmails: {
+      "default": [],
+      type: Array
     }
 });
 

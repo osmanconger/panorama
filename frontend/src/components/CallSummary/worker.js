@@ -1,9 +1,13 @@
+// worker script
 export default () => {
   onmessage = (e) => {
-    let {toEmail, message} = e.data
-    let to = {email: toEmail};
-    console.log(to);
+    let {emails, names} = e.data
+    console.log(e.data);
+    console.log("in worler", emails);
 
+    let html = `Attendees: ${names}<br/>`
+    let to = {email: emails, html: html};
+    
     fetch(`http://localhost:5000/api/text-mail`, {
       method: 'POST', 
       headers: {
@@ -16,6 +20,7 @@ export default () => {
           
       const success = "success";
       const time = new Date().getTime();
+      console.log("done in worker");
     
       postMessage({
         success,

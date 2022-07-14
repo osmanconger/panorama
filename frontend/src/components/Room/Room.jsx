@@ -4,12 +4,16 @@ import { Button } from "@mui/material";
 import "./Room.css";
 import Participant from "../Participant/Participant";
 import Whiteboard from "../Whiteboard/Whiteboard";
+import WorkerBuilder from "../CallSummary/WorkerBuilder";
+import Worker from "../CallSummary/worker";
 
 const Room = ({ room, id }) => {
   const [remoteParticipants, setRemoteParticipants] = useState([]);
   //audioOn set to true means unmuted
   const [audioOn, setAudioOn] = useState(true);
   const [videoOn, setVideoOn] = useState(true);
+  const [participants, setParticipants] = useState([]);
+  const [participantEmails, setParticipantEmails] = useState([]);
 
   useEffect(() => {
     const addParticipant = (participant) => {
@@ -58,6 +62,23 @@ const Room = ({ room, id }) => {
       // publication.track.detach();
     });
     setVideoOn(false);
+  };
+
+  const sendSummary = () => {
+    fetch(`http://localhost:5000/api/room/${id}/participants`)
+    .then((res) => res.json())
+    .then((json) => {
+      const worker = new WorkerBuilder(Worker);
+      console.log("here", json.emails);
+      const emails = json.emails;
+      const names = json.names;
+        worker.postMessage({emails, names});
+        worker.onerror = (err) => err;
+        worker.onmessage = (e) => {
+          console.log(e.data);
+          worker.terminate();
+        };
+    });
   };
 
   return (
@@ -112,7 +133,7 @@ const Room = ({ room, id }) => {
             <i className="fa-solid fa-video-slash"></i>
             <i className="fa-solid fa-phone-xmark"></i> */}
             {/* TODO: Only show this option if you are the host */}
-            <Button variant="outlined" color="error">
+            <Button variant="outlined" color="error" onClick={() => sendSummary()}>
               End Call
             </Button>
           </div>

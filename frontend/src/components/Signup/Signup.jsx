@@ -11,9 +11,19 @@ function Signup() {
   const [pass, setPass] = useState("");
   const [pass2, setPass2] = useState("");
 
+  const username = React.useRef(null);
+  const password2 = React.useRef(null);
+  const password1 = React.useRef(null);
+  const emailfield = React.useRef(null);
+
   const handleSubmit = (e) => {
     //Prevent page reload
     e.preventDefault();
+    username.current.value = "";
+    password1.current.value = "";
+    password2.current.value= "";
+    emailfield.current.value="";
+    
 
     if (pass2!=pass) {
       console.log("pass does not match");
@@ -39,7 +49,7 @@ function Signup() {
     })
     .then(data => {
       console.log('Success:', data);
-      alert("Successfully sign up. You may now log in.")
+      alert("Successfully signed up. You may now log in.")
     })
     .catch((error) => {
       console.error('Error:', error);
@@ -53,12 +63,13 @@ function Signup() {
     );
 
   // JSX code for signup form
-  const renderForm = (
+  /*const renderForm = (
     <div>
       <form onSubmit={handleSubmit} className = "form">
         <TextField
             variant="standard"
             placeholder="Enter username"
+            inputRef={username}
             value={user}
             onChange={(e) => setUser(e.target.value)}
         />
@@ -84,7 +95,7 @@ function Signup() {
         </Button>
       </form>
     </div>
-  );
+  );*/
 
   return ( 
     <div>
@@ -92,6 +103,7 @@ function Signup() {
         <TextField
             variant="standard"
             placeholder="Enter username"
+            inputRef={username}
             value={user}
             onChange={(e) => setUser(e.target.value)}
         />
@@ -99,6 +111,7 @@ function Signup() {
         <TextField
             variant="standard"
             placeholder="Enter Email"
+            inputRef={emailfield}
             value={email}
             onChange={(e) => setEmail(e.target.value)}
         />
@@ -107,6 +120,7 @@ function Signup() {
             variant="standard"
             type="password"
             placeholder="Enter password"
+            inputRef={password1}
             value={pass}
             onChange={(e) => setPass(e.target.value)}
         />
@@ -114,6 +128,7 @@ function Signup() {
         <TextField
             variant="standard"
             type="password"
+            inputRef={password2}
             placeholder="Confirm password"
             value={pass2}
             onChange={(e) => setPass2(e.target.value)}
