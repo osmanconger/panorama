@@ -23,6 +23,24 @@ const server = http.createServer(app);
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(bodyParser.json());
 
+
+// database stuff
+const mongoose = require("mongoose");
+const mongoString = process.env.DATABASE_URL;
+const users = require("./models/user");
+const rooms = require("./models/room.js")
+
+mongoose.connect(mongoString);
+const database = mongoose.connection;
+
+database.on("error", (error) => {
+  console.log(error);
+});
+
+database.once("connected", () => {
+  console.log("Database Connected");
+});
+
 //Again required for CORS
 app.use(function (req, res, next) {
   res.header("Access-Control-Allow-Origin", "http://localhost:3000");
@@ -34,6 +52,12 @@ app.post("/api/token", (req, res) => {
   const identity = req.body.identity;
   const room = req.body.room;
   const token = getVideoToken(identity, room);
+  rooms.findOne({ id: room }, function (err3, data) {
+    if (data) {
+      data.participants.push(identity);
+      data.save();
+    }
+    });
   res.send(JSON.stringify({ token: token }));
 });
 
@@ -61,6 +85,14 @@ app.post("/api/room/token", (req, res) => {
   const roomId = uuid.v4();
   const identity = req.body.identity;
   const token = getVideoToken(identity, roomId);
+
+  // store room in database -> TO DO: fix so that this isnt upon generation, but upon host joining room
+  rooms.create({id: roomId},
+    function (err2, createdRoom) {
+      if (err2) return res.status(500).end(err2);
+      createdRoom.participants.push(identity);
+      createdRoom.save();
+    });
   res.send(JSON.stringify({ token: token, id: roomId }));
 });
 
@@ -69,21 +101,6 @@ app.post("/api/room/token", (req, res) => {
 //   res.json({ roomId: req.params.roomId });
 // });
 
-// database stuff
-const mongoose = require("mongoose");
-const mongoString = process.env.DATABASE_URL;
-const users = require("./models/model");
-
-mongoose.connect(mongoString);
-const database = mongoose.connection;
-
-database.on("error", (error) => {
-  console.log(error);
-});
-
-database.once("connected", () => {
-  console.log("Database Connected");
-});
 
 app.use(
   session({
@@ -109,18 +126,19 @@ app.post("/api/signup/", function (req, res, next) {
 
   let uname = req.body.username;
   let password = req.body.password;
+  let email = req.body.email;
 
   users.findOne({ username: uname }, function (err3, user) {
     if (err3) return res.status(500).end(err3);
     if (user) {
-      return res.status(409).end("username " + uname + " already exists");
+      return res.status(409).end("username " + uname + " already exists"); // TO DO: check for unique email too
     }
     // hash the password
     const saltRounds = 10;
     bcrypt.hash(password, saltRounds, function (err, hash) {
       // insert user
       users.create(
-        { username: uname, password: hash },
+        { username: uname, password: hash, email: email },
         function (err2, userCreated) {
           if (err2) return res.status(500).end(err2);
           req.session.user = userCreated;
@@ -156,6 +174,12 @@ app.post("/api/login", (req, res) => {
   // return res.json(req.session.user);
 });
 
+// get room participants
+app.get("/api/room/:roomId/participants", (req, res) => {
+  
+});
+
+// email stuff
 server.listen(port, () => {
   console.log(`Listening at http://localhost:${port}`);
   console.log(process.env.EMAIL);
@@ -172,13 +196,13 @@ const transporter = nodemailer.createTransport({
 });
 
 app.post('/api/text-mail', function (req, res, next) {
-  const {email, subject } = req.body;
+  const {email, html } = req.body;
   console.log(email);
   const mailData = {
       from: process.env.EMAIL,
       to: email,
-      subject: subject,
-      html: '<b>Hey there! </b><br> This is our first message sent with Nodemailer<br/>',
+      subject: "Panorama video call summary",
+      html: html,
   };
 
   transporter.sendMail(mailData, (error, info) => {
