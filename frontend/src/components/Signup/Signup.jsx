@@ -94,6 +94,7 @@ function Signup() {
             value={user}
             onChange={(e) => setUser(e.target.value)}
         />
+        <br />
         <TextField
             variant="standard"
             type="password"
@@ -101,6 +102,7 @@ function Signup() {
             value={pass}
             onChange={(e) => setPass(e.target.value)}
         />
+        <br />
         <TextField
             variant="standard"
             type="password"
@@ -108,6 +110,7 @@ function Signup() {
             value={pass2}
             onChange={(e) => setPass2(e.target.value)}
         />
+        <br />
         <Button variant="outlined" type="submit">
             Sign In
         </Button>
