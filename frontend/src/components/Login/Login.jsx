@@ -1,4 +1,7 @@
-import React, { useEffect, useState } from "react";
+import { Button, TextField } from "@mui/material";
+import React, { useEffect, useState, useContext } from "react";
+import { AuthContext } from "../../context/AuthProvider";
+import "../Form.css";
 
 function Login() {
   const [errors, setErrors] = useState({});
@@ -38,28 +41,52 @@ function Login() {
 
   // JSX code for login form
   const renderForm = (
-    <div className="form">
-      <form onSubmit={handleSubmit}>
-        <div className="input-container">
-          <label>Username </label>
-          <input type="text" name="username" required onChange={e => setUser(e.target.value)} />
-        </div>
-        <div className="input-container">
-          <label>Password </label>
-          <input type="password" name="pass" required onChange={e => setPass(e.target.value)}  />
-        </div>
-        <div className="button-container">
-          <input type="submit" />
-        </div>
+    <div>
+      <form onSubmit={handleSubmit} className = "form">
+        <TextField
+            variant="standard"
+            placeholder="Enter username"
+            value={username}
+            onChange={(e) => setUsername(e.target.value)}
+        />
+        <TextField
+            variant="standard"
+            type="password"
+            placeholder="Enter password"
+            value={pass}
+            onChange={(e) => setPass(e.target.value)}
+        />
+        <Button variant="outlined" type="submit">
+            Log In
+        </Button>
       </form>
     </div>
   );
 
-  return ( 
-    <div className="Login">
-      <h1> Log in to Panorama</h1>
-      {isSubmitted ? <div>User is successfully logged in</div> : renderForm}
-    </div>
+  return (
+    <div>
+    <form onSubmit={handleSubmit} className = "form">
+      
+      <TextField
+          variant="standard"
+          placeholder="Enter username"
+          value={username}
+          onChange={(e) => setUsername(e.target.value)}
+      />
+      <br />
+      <TextField
+          variant="standard"
+          type="password"
+          placeholder="Enter password"
+          value={pass}
+          onChange={(e) => setPass(e.target.value)}
+      />
+      <br />
+      <Button variant="outlined" type="submit">
+          Log In
+      </Button>
+    </form>
+  </div>
   );
 }
 
