@@ -7,11 +7,15 @@ import { useContext, useState } from "react";
 import "../Form.css";
 import { AuthContext } from "../../context/AuthProvider";
 
-const CreateRoom = () => {
+const CreateRoom = ({ setInRoom }) => {
   const { user } = useContext(AuthContext);
   const [roomId, setRoomId] = useState(null);
   const [token, setToken] = useState(null);
   const [room, setRoom] = useState(null);
+
+  const changeRoom = (room) => {
+    setRoom(room);
+  };
 
   const createRoom = (e) => {
     e.preventDefault();
@@ -38,16 +42,12 @@ const CreateRoom = () => {
   const joinRoom = (e) => {
     e.preventDefault();
     connect(token, { name: roomId })
-      .then((newRoom) => setRoom(newRoom))
+      .then((newRoom) => {
+        setInRoom(true);
+        setRoom(newRoom);
+      })
       .catch((err) => console.log(err));
   };
-
-  //TODO: Try to redirect to room component and pass in state instead of rendering the room here
-  // const redirectToRoom = (newRoom) => {
-  //   console.log(newRoom);
-  //   navigate(`/${roomId}`, { replace: false, state: { newRoom: newRoom } });
-  //   // navigate(`/${roomId}`, { state: { room: { newRoom } } });
-  // };
 
   return (
     <div>
@@ -69,7 +69,7 @@ const CreateRoom = () => {
           </>
         )}
       </form>
-      {room && <Room room={room} id={roomId} />}
+      {room && <Room room={room} id={roomId} setRoom={changeRoom} />}
     </div>
   );
 };

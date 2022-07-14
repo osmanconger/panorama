@@ -13,14 +13,34 @@
   column-gap: 1rem;
 }
 
-.videos-container {
-  width: 80%;
-  height: 90vh;
+/* .videos-container {
+  display: grid;
+  grid-gap: 16px;
+  grid-template-columns: repeat(2, 1fr);
+  grid-template-rows: 1fr min-content;
   display: flex;
+  justify-content: center;
+  align-items: center;
+  
 }
+.videos-container > * {
+  flex: 1;
+} */
 
 .controls {
   display: flex;
   column-gap: 1rem;
   justify-content: center;
+}
+
+#local-user video {
+  background-color: #5da5ec;
+  padding: 5px;
+  border-radius: 5px;
+  color: white;
+}
+
+.participant {
+  height: 100%;
+  width: 100%;
 }

@@ -1,10 +1,15 @@
 import { useState, useRef, useEffect } from "react";
 
-const Participant = ({ participant }) => {
+const Participant = ({ participant, videoOn, audioOn }) => {
   const [videos, setVideos] = useState([]);
   const [audios, setAudios] = useState([]);
   const videoRef = useRef();
   const audioRef = useRef();
+
+  useEffect(() => {
+    if (!videoOn) setVideos([]);
+    if (!audioOn) setAudios([]);
+  }, [videoOn, audioOn]);
 
   const addTrack = (track) => {
     if (track.kind === "video") setVideos((videos) => [...videos, track]);
@@ -37,12 +42,13 @@ const Participant = ({ participant }) => {
     participant.on("trackUnsubscribed", (track) => {
       removeTrack(track);
     });
-  }, [participant]);
+  }, [participant, videoOn, audioOn]);
 
   //attach video
   useEffect(() => {
     const video = videos[0];
     if (video) video.attach(videoRef.current);
+    console.log(videos);
   }, [videos]);
 
   useEffect(() => {
@@ -51,11 +57,11 @@ const Participant = ({ participant }) => {
   }, [audios]);
 
   return (
-    <div>
+    <>
       <h3>{participant.identity}</h3>
-      <video ref={videoRef} autoPlay playsInline />
-      <audio ref={audioRef} autoPlay />
-    </div>
+      {videoOn && <video ref={videoRef} autoPlay playsInline />}
+      {audioOn && <audio ref={audioRef} autoPlay />}
+    </>
   );
 };
 

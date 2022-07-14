@@ -1,10 +1,11 @@
 import { useState, useEffect } from "react";
-import { Button } from "@mui/material";
+import { Button, Grid } from "@mui/material";
+import { Mic, MicOff, Videocam, VideocamOff } from "@mui/icons-material";
 
 import "./Room.css";
 import Participant from "../Participant/Participant";
 
-const Room = ({ room, id }) => {
+const Room = ({ room, id, setRoom }) => {
   const [remoteParticipants, setRemoteParticipants] = useState([]);
   //audioOn set to true means unmuted
   const [audioOn, setAudioOn] = useState(true);
@@ -26,7 +27,6 @@ const Room = ({ room, id }) => {
       room.on("participantDisconnected", removeParticipant);
       //local participant disconnects
       window.addEventListener("pagehide", () => room.disconnect());
-      window.addEventListener("beforeunload", () => room.disconnect());
     }
   }, [room]);
 
@@ -45,18 +45,29 @@ const Room = ({ room, id }) => {
   };
 
   const startVideo = () => {
-    room.localParticipant.videoTracks.forEach((publication) =>
-      publication.track.enable()
-    );
+    room.localParticipant.videoTracks.forEach((publication) => {
+      publication.track.enable();
+      publication.track.attach();
+    });
     setVideoOn(true);
   };
 
   const stopVideo = () => {
     room.localParticipant.videoTracks.forEach((publication) => {
       publication.track.disable();
-      // publication.track.detach();
+      publication.track.detach();
     });
     setVideoOn(false);
+  };
+
+  const leaveRoom = () => {
+    if (room.localParticipant.state === "connected") {
+      room.localParticipant.tracks.forEach((publication) =>
+        publication.track.stop()
+      );
+      room.disconnect();
+    }
+    setRoom(null);
   };
 
   return (
@@ -78,41 +89,52 @@ const Room = ({ room, id }) => {
             </Button>
           </div>
           <div className="videos-container">
-            <div id="local-user">
-              <Participant participant={room.localParticipant} />
+            <div className="participant" id="local-user">
+              <Participant
+                participant={room.localParticipant}
+                videoOn={videoOn}
+                audioOn={audioOn}
+              />
             </div>
             {remoteParticipants.map((participant) => (
-              <Participant key={participant.sid} participant={participant} />
+              <div className="participant">
+                <Participant
+                  key={participant.sid}
+                  participant={participant}
+                  videoOn={true}
+                  audioOn={true}
+                />
+              </div>
             ))}
             {/* <Whiteboard roomId={id} /> */}
           </div>
+          <br />
+          <br />
           <div className="controls">
             {audioOn ? (
               <Button variant="outlined" onClick={() => mute()}>
-                Mute
+                <MicOff /> Turn Mic Off
               </Button>
             ) : (
               <Button variant="outlined" onClick={() => unmute()}>
-                Unmute
+                <Mic /> Turn Mic On
               </Button>
             )}
             {videoOn ? (
               <Button variant="outlined" onClick={() => stopVideo()}>
-                Turn Video Off
+                <VideocamOff /> Turn Video Off
               </Button>
             ) : (
               <Button variant="outlined" onClick={() => startVideo()}>
-                Turn Video On
+                <Videocam /> Turn Video On
               </Button>
             )}
-            {/* <i className="fa-solid fa-microphone"></i>
-            <i className="fa-solid fa-microphone-slash"></i>
-            <i className="fa-solid fa-video"></i>
-            <i className="fa-solid fa-video-slash"></i>
-            <i className="fa-solid fa-phone-xmark"></i> */}
-            {/* TODO: Only show this option if you are the host */}
-            <Button variant="outlined" color="error">
-              End Call
+            <Button
+              variant="outlined"
+              color="error"
+              onClick={() => leaveRoom()}
+            >
+              Leave Call
             </Button>
           </div>
         </div>

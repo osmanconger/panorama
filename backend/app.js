@@ -63,11 +63,6 @@ app.post("/api/room/token", (req, res) => {
   res.send(JSON.stringify({ token: token, id: roomId }));
 });
 
-// //Get room information
-// app.get("/api/:roomId", (req, res) => {
-//   res.json({ roomId: req.params.roomId });
-// });
-
 // database stuff
 const mongoose = require("mongoose");
 const mongoString = process.env.DATABASE_URL;
