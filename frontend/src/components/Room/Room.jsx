@@ -3,6 +3,7 @@ import { Button } from "@mui/material";
 
 import "./Room.css";
 import Participant from "../Participant/Participant";
+import Whiteboard from "../Whiteboard/Whiteboard";
 
 const Room = ({ room, id }) => {
   const [remoteParticipants, setRemoteParticipants] = useState([]);
@@ -84,7 +85,7 @@ const Room = ({ room, id }) => {
             {remoteParticipants.map((participant) => (
               <Participant key={participant.sid} participant={participant} />
             ))}
-            {/* <Whiteboard roomId={id} /> */}
+             <Whiteboard roomId={id} /> 
           </div>
           <div className="controls">
             {audioOn ? (

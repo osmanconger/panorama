@@ -1,20 +1,40 @@
 import { TldrawApp } from "@tldraw/tldraw";
 import { useCallback, useEffect, useState } from "react";
 import { Room } from "@y-presence/client";
-import {
-  awareness,
-  doc,
-  provider,
-  undoManager,
-  yBindings,
-  yShapes
-} from "./storage";
-
-const room = new Room(awareness, {});
+import { WebsocketProvider } from "y-websocket";
+import * as yjs from "yjs";
 
 export function useMultiplayerState(roomId) {
+
+  // Create the doc
+ const doc = new yjs.Doc();
+
+ // Create a websocket provider
+  const provider = new WebsocketProvider(
+   "ws://localhost:1234",
+   roomId,
+   doc,
+   {
+     connect: true,
+   }
+ );
+ 
+ // Export the provider's awareness API
+  const awareness = provider.awareness;
+
+  const room = new Room(awareness, {});
+ 
+  const yShapes = doc.getMap("shapes");
+  const yBindings = doc.getMap("bindings");
+ 
+ // Create an undo manager for the shapes and binding maps
+  const undoManager = new yjs.UndoManager([yShapes, yBindings]);
+
+
+  
   const [app, setApp] = useState(new TldrawApp());
   const [loading, setLoading] = useState(true);
+
 
   const onMount = useCallback(
     (app2) => {
