@@ -6,17 +6,21 @@ import { AuthContext } from "../../context/AuthProvider";
 import "../Form.css";
 import Room from "../Room/Room";
 
-const JoinRoom = () => {
+const JoinRoom = ({ setInRoom }) => {
   const { user } = useContext(AuthContext);
   const [roomId, setRoomId] = useState("");
   const [room, setRoom] = useState(null);
-  // const [name, setName] = useState("");
   const [errors, setErrors] = useState("");
+
+  //passed to Room so that if the local participant leaves, this can be set to null, or vice versa
+  const changeRoom = (room) => {
+    setRoom(room);
+  };
 
   const joinRoom = (e) => {
     e.preventDefault();
     fetch(`http://localhost:5000/api/room/${roomId}`).then((res) => {
-      //Connect to room if it exists
+      //Connect to room if it exists, otherwise set error to show it does not exist
       if (res.status === 200) {
         fetch(`http://localhost:5000/api/token`, {
           method: "POST",
@@ -32,7 +36,10 @@ const JoinRoom = () => {
             return res.json();
           })
           .then((json) => {
-            connect(json.token, { name: roomId }).then((room) => setRoom(room));
+            connect(json.token, { name: roomId }).then((room) => {
+              setRoom(room);
+              setInRoom(true);
+            });
           })
           .catch((err) => console.log(err));
       } else {
@@ -56,10 +63,10 @@ const JoinRoom = () => {
           <Button variant="outlined" type="submit">
             Join Room
           </Button>
-          {errors && <p>{errors}</p>}
+          {errors && <p className="error">{errors}</p>}
         </form>
       ) : (
-        <Room room={room} id={roomId} />
+        <Room room={room} id={roomId} setRoom={changeRoom} />
       )}
     </div>
   );
