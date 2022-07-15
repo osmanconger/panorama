@@ -6,6 +6,8 @@ import { Mic, MicOff, Videocam, VideocamOff } from "@mui/icons-material";
 import "./Room.css";
 import Participant from "../Participant/Participant";
 import Whiteboard from "../Whiteboard/Whiteboard";
+import WorkerBuilder from "../CallSummary/WorkerBuilder";
+import Worker from "../CallSummary/worker";
 
 const Room = ({ room, id, setRoom }) => {
   //the mode can either be "draw" or "vid" corresponding to seeing the whiteboard or video
@@ -15,6 +17,8 @@ const Room = ({ room, id, setRoom }) => {
   //audioOn set to true means unmuted
   const [audioOn, setAudioOn] = useState(true);
   const [videoOn, setVideoOn] = useState(true);
+  const [participants, setParticipants] = useState([]);
+  const [participantEmails, setParticipantEmails] = useState([]);
 
   useEffect(() => {
     const addParticipant = (participant) => {
@@ -74,6 +78,22 @@ const Room = ({ room, id, setRoom }) => {
     }
     setRoom(null);
   };
+  const sendSummary = () => {
+    fetch(`http://localhost:5000/api/room/${id}/participants`)
+      .then((res) => res.json())
+      .then((json) => {
+        const worker = new WorkerBuilder(Worker);
+        console.log("here", json.emails);
+        const emails = json.emails;
+        const names = json.names;
+        worker.postMessage({ emails, names });
+        worker.onerror = (err) => err;
+        worker.onmessage = (e) => {
+          console.log(e.data);
+          worker.terminate();
+        };
+      });
+  };
 
   return (
     <div className="room page">
@@ -93,6 +113,8 @@ const Room = ({ room, id, setRoom }) => {
               Copy Room Id
             </Button>
           </div>
+          <br />
+          <br />
           <ToggleButtonGroup
             color="primary"
             value={mode}
@@ -102,6 +124,8 @@ const Room = ({ room, id, setRoom }) => {
             <ToggleButton value="vid">Videos</ToggleButton>
             <ToggleButton value="draw">Whiteboard</ToggleButton>
           </ToggleButtonGroup>
+          <br />
+          <br />
           {mode === "vid" ? (
             <div className="videos-container">
               <div className="participant" id="local-user">
@@ -152,6 +176,13 @@ const Room = ({ room, id, setRoom }) => {
               onClick={() => leaveRoom()}
             >
               Leave Call
+            </Button>
+            <Button
+              variant="outlined"
+              color="error"
+              onClick={() => sendSummary()}
+            >
+              Send Email
             </Button>
           </div>
         </div>

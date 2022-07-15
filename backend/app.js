@@ -1,4 +1,5 @@
 const express = require("express");
+const nodemailer = require("nodemailer");
 const http = require("http");
 const uuid = require("uuid");
 const getVideoToken = require("./generate-token");
@@ -22,6 +23,23 @@ const server = http.createServer(app);
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(bodyParser.json());
 
+// database stuff
+const mongoose = require("mongoose");
+const mongoString = process.env.DATABASE_URL;
+const users = require("./models/user");
+const rooms = require("./models/room.js");
+
+mongoose.connect(mongoString);
+const database = mongoose.connection;
+
+database.on("error", (error) => {
+  console.log(error);
+});
+
+database.once("connected", () => {
+  console.log("Database Connected");
+});
+
 //Again required for CORS
 app.use(function (req, res, next) {
   res.header("Access-Control-Allow-Origin", "http://localhost:3000");
@@ -33,6 +51,15 @@ app.post("/api/token", (req, res) => {
   const identity = req.body.identity;
   const room = req.body.room;
   const token = getVideoToken(identity, room);
+  rooms.findOne({ id: room }, function (err3, data) {
+    if (data) {
+      users.findOne({ username: identity }, function (err, user) {
+        data.participants.push(identity);
+        data.participantEmails.push(user.email);
+        data.save();
+      });
+    }
+  });
   res.send(JSON.stringify({ token: token }));
 });
 
@@ -60,23 +87,17 @@ app.post("/api/room/token", (req, res) => {
   const roomId = uuid.v4();
   const identity = req.body.identity;
   const token = getVideoToken(identity, roomId);
+
+  // store room in database -> TO DO: fix so that this isnt upon generation, but upon host joining room
+  rooms.create({ id: roomId }, function (err2, createdRoom) {
+    if (err2) return res.status(500).end(err2);
+    users.findOne({ username: identity }, function (err, user) {
+      createdRoom.participants.push(identity);
+      createdRoom.participantEmails.push(user.email);
+      createdRoom.save();
+    });
+  });
   res.send(JSON.stringify({ token: token, id: roomId }));
-});
-
-// database stuff
-const mongoose = require("mongoose");
-const mongoString = process.env.DATABASE_URL;
-const users = require("./models/model");
-
-mongoose.connect(mongoString);
-const database = mongoose.connection;
-
-database.on("error", (error) => {
-  console.log(error);
-});
-
-database.once("connected", () => {
-  console.log("Database Connected");
 });
 
 app.use(
@@ -103,18 +124,19 @@ app.post("/api/signup/", function (req, res, next) {
 
   let uname = req.body.username;
   let password = req.body.password;
+  let email = req.body.email;
 
   users.findOne({ username: uname }, function (err3, user) {
     if (err3) return res.status(500).end(err3);
     if (user) {
-      return res.status(409).end("username " + uname + " already exists");
+      return res.status(409).end("username " + uname + " already exists"); // TO DO: check for unique email too
     }
     // hash the password
     const saltRounds = 10;
     bcrypt.hash(password, saltRounds, function (err, hash) {
       // insert user
       users.create(
-        { username: uname, password: hash },
+        { username: uname, password: hash, email: email },
         function (err2, userCreated) {
           if (err2) return res.status(500).end(err2);
           req.session.user = userCreated;
@@ -150,6 +172,51 @@ app.post("/api/login", (req, res) => {
   // return res.json(req.session.user);
 });
 
+// get room participants
+app.get("/api/room/:roomId/participants", (req, res) => {
+  rooms.findOne({ id: req.params.roomId }, function (err, data) {
+    if (err) return res.status(500).end(err);
+    console.log(data.participants);
+    console.log(data.participantEmails);
+    return res.send(
+      JSON.stringify({
+        names: data.participants,
+        emails: data.participantEmails,
+      })
+    );
+  });
+});
+
+// email stuff
 server.listen(port, () => {
   console.log(`Listening at http://localhost:${port}`);
+  console.log(process.env.EMAIL);
+});
+
+const transporter = nodemailer.createTransport({
+  port: 465,
+  host: "smtp.gmail.com",
+  auth: {
+    user: process.env.EMAIL,
+    pass: process.env.PASS,
+  },
+  secure: true, // upgrades later with STARTTLS -- change this based on the PORT
+});
+
+app.post("/api/text-mail", function (req, res, next) {
+  const { email, html } = req.body;
+  console.log(email);
+  const mailData = {
+    from: process.env.EMAIL,
+    to: email,
+    subject: "Panorama video call summary",
+    html: html,
+  };
+
+  transporter.sendMail(mailData, (error, info) => {
+    if (error) {
+      return console.log(error);
+    }
+    res.status(200).send({ message: "Mail send", message_id: info.messageId });
+  });
 });

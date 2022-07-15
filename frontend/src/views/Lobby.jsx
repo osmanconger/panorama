@@ -23,13 +23,12 @@ const Lobby = () => {
 
   const changeLoginType = (e) => {
     setLoginType(e.target.value);
-  }
+  };
 
   return (
     <div>
       {user ? (
         <div className="lobby page">
-          {/* Only show toggle if user is not already in a room */}
           {!inRoom && (
             <ToggleButtonGroup
               color="primary"
