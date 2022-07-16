@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { Button, TextField } from "@mui/material";
 import "../Form.css";
+import linkedinButton from "../../assets/linkedin-button.png";
 
 function Signup() {
   const [errors, setErrors] = useState({});
@@ -16,7 +17,7 @@ function Signup() {
   const password1 = React.useRef(null);
   const emailfield = React.useRef(null);
 
-  const handleSubmit = (e) => {
+  const handleSubmit = e => {
     //Prevent page reload
     e.preventDefault();
     username.current.value = "";
@@ -34,11 +35,11 @@ function Signup() {
     fetch(`http://localhost:5000/api/signup/`, {
       method: "POST",
       headers: {
-        "Content-Type": "application/json",
+        "Content-Type": "application/json"
       },
-      body: JSON.stringify(creds),
+      body: JSON.stringify(creds)
     })
-      .then((res) => {
+      .then(res => {
         if (res.status != 200) {
           let error = "";
           if (res.status === 409) error = "username already taken";
@@ -46,18 +47,16 @@ function Signup() {
           console.log(error);
         } else return res.json();
       })
-      .then((data) => {
+      .then(data => {
         console.log("Success:", data);
         alert("Successfully signed up. You may now log in.");
       })
-      .catch((error) => {
+      .catch(error => {
         console.error("Error:", error);
       });
   };
 
-  const renderErrorMessage = (message) => (
-    <div className="error">{message}</div>
-  );
+  const renderErrorMessage = message => <div className="error">{message}</div>;
 
   return (
     <div>
@@ -67,7 +66,7 @@ function Signup() {
           placeholder="Enter username"
           inputRef={username}
           value={user}
-          onChange={(e) => setUser(e.target.value)}
+          onChange={e => setUser(e.target.value)}
         />
         <br />
         <TextField
@@ -75,7 +74,7 @@ function Signup() {
           placeholder="Enter Email"
           inputRef={emailfield}
           value={email}
-          onChange={(e) => setEmail(e.target.value)}
+          onChange={e => setEmail(e.target.value)}
         />
         <br />
         <TextField
@@ -84,7 +83,7 @@ function Signup() {
           placeholder="Enter password"
           inputRef={password1}
           value={pass}
-          onChange={(e) => setPass(e.target.value)}
+          onChange={e => setPass(e.target.value)}
         />
         <br />
         <TextField
@@ -93,12 +92,16 @@ function Signup() {
           inputRef={password2}
           placeholder="Confirm password"
           value={pass2}
-          onChange={(e) => setPass2(e.target.value)}
+          onChange={e => setPass2(e.target.value)}
         />
         <br />
         <Button variant="outlined" type="submit">
-          Sign In
+          Sign Up
         </Button>
+        <br />
+        <a href="http://localhost:5000/api/linkedin/auth">
+          <img className="linkedinButton" src={linkedinButton} />
+        </a>
       </form>
     </div>
   );

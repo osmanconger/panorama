@@ -1,4 +1,4 @@
-import { useContext, useState } from "react";
+import { useContext, useState, useEffect } from "react";
 import { ToggleButtonGroup, ToggleButton } from "@mui/material";
 import { AuthContext } from "../context/AuthProvider";
 
@@ -9,7 +9,7 @@ import Signup from "../components/Signup/Signup";
 import "./Lobby.css";
 
 const Lobby = () => {
-  const { user } = useContext(AuthContext);
+  const { user, setUser } = useContext(AuthContext);
 
   //set default type to join room, instead of creating a room
   const [type, setType] = useState("join");
@@ -17,11 +17,35 @@ const Lobby = () => {
 
   const [inRoom, setInRoom] = useState(false);
 
-  const changeRoom = (val) => {
+  const changeRoom = val => {
     setInRoom(val);
   };
 
-  const changeLoginType = (e) => {
+  useEffect(() => {
+    if (!user) {
+      fetch(`http://localhost:5000/api/linkedin/auth/success`, {
+        method: "GET",
+        credentials: "include",
+        headers: {
+          "Content-Type": "application/json",
+          "Access-Control-Allow-Credentials": true
+        }
+      })
+        .then(response => {
+          if (response.status === 200) return response.json();
+          throw new Error("authentication has been failed!");
+        })
+        .then(json => {
+          console.log(json);
+          setUser({ id: json._id, name: json.username });
+        })
+        .catch(error => {
+          console.error("Error:", error);
+        });
+    }
+  }, []);
+
+  const changeLoginType = e => {
     setLoginType(e.target.value);
   };
 
@@ -34,7 +58,7 @@ const Lobby = () => {
               color="primary"
               value={type}
               exclusive
-              onChange={(e) => setType(e.target.value)}
+              onChange={e => setType(e.target.value)}
             >
               <ToggleButton value="join">Join Room</ToggleButton>
               <ToggleButton value="create">Create Room</ToggleButton>

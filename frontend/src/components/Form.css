@@ -6,6 +6,11 @@
   padding: 20px;
 }
 
-.form > * {
+.form>* {
   margin-bottom: 10px;
+}
+
+.linkedinButton {
+  height: 40px;
+  width: 220px;
 }

@@ -2,6 +2,7 @@ import { Button, TextField } from "@mui/material";
 import React, { useEffect, useState, useContext } from "react";
 import { AuthContext } from "../../context/AuthProvider";
 import "../Form.css";
+import linkedinButton from "../../assets/linkedin-button.png";
 
 function Login() {
   const { user, setUser } = useContext(AuthContext);
@@ -12,7 +13,7 @@ function Login() {
 
   const [pass, setPass] = useState("");
 
-  const handleSubmit = (e) => {
+  const handleSubmit = e => {
     //Prevent page reload
     e.preventDefault();
     const creds = { username: username, password: pass };
@@ -21,43 +22,42 @@ function Login() {
     fetch(`http://localhost:5000/api/login`, {
       method: "POST",
       headers: {
-        "Content-Type": "application/json",
+        "Content-Type": "application/json"
       },
-      body: JSON.stringify(creds),
+      body: JSON.stringify(creds)
     })
-      .then((response) => response.json())
+      .then(response => response.json())
       //TODO: Possibly check status is ok before rendering
-      .then((json) => {
+      .then(json => {
+        console.log(json);
         setUser({ id: json._id, name: json.username });
       })
-      .catch((error) => {
+      .catch(error => {
         console.error("Error:", error);
       });
   };
 
-  const renderErrorMessage = (message) => (
-    <div className="error">{message}</div>
-  );
+  const renderErrorMessage = message => <div className="error">{message}</div>;
 
   // JSX code for login form
   const renderForm = (
     <div>
-      <form onSubmit={handleSubmit} className = "form">
+      <form onSubmit={handleSubmit} className="form">
         <TextField
-            variant="standard"
-            placeholder="Enter username"
-            value={username}
-            onChange={(e) => setUsername(e.target.value)}
+          variant="standard"
+          placeholder="Enter username"
+          value={username}
+          onChange={e => setUsername(e.target.value)}
         />
         <TextField
-            variant="standard"
-            type="password"
-            placeholder="Enter password"
-            value={pass}
-            onChange={(e) => setPass(e.target.value)}
+          variant="standard"
+          type="password"
+          placeholder="Enter password"
+          value={pass}
+          onChange={e => setPass(e.target.value)}
         />
         <Button variant="outlined" type="submit">
-            Log In
+          Log In
         </Button>
       </form>
     </div>
@@ -65,28 +65,31 @@ function Login() {
 
   return (
     <div>
-    <form onSubmit={handleSubmit} className = "form">
-      
-      <TextField
+      <form onSubmit={handleSubmit} className="form">
+        <TextField
           variant="standard"
           placeholder="Enter username"
           value={username}
-          onChange={(e) => setUsername(e.target.value)}
-      />
-      <br />
-      <TextField
+          onChange={e => setUsername(e.target.value)}
+        />
+        <br />
+        <TextField
           variant="standard"
           type="password"
           placeholder="Enter password"
           value={pass}
-          onChange={(e) => setPass(e.target.value)}
-      />
-      <br />
-      <Button variant="outlined" type="submit">
+          onChange={e => setPass(e.target.value)}
+        />
+        <br />
+        <Button variant="outlined" type="submit">
           Log In
-      </Button>
-    </form>
-  </div>
+        </Button>
+        <br />
+        <a href="http://localhost:5000/api/linkedin/auth">
+          <img className="linkedinButton" src={linkedinButton} />
+        </a>
+      </form>
+    </div>
   );
 }
 
