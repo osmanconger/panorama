@@ -21,6 +21,7 @@ const Lobby = () => {
     setInRoom(val);
   };
 
+  // check if the user has authenticated through linkedin
   useEffect(() => {
     if (!user) {
       fetch(`http://localhost:5000/api/linkedin/auth/success`, {

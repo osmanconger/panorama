@@ -307,6 +307,7 @@ app.get("/api/linkedin/auth/failure", (req, res) => {
   res.send("Failed to authenticate..");
 });
 
+// clear out the session
 app.get("/api/logout", (req, res) => {
   req.session.destroy();
   return res.status(200).send("logout is successful");
