@@ -1,5 +1,5 @@
 import { useContext, useState, useEffect } from "react";
-import { ToggleButtonGroup, ToggleButton } from "@mui/material";
+import { ToggleButtonGroup, ToggleButton, Button, Box } from "@mui/material";
 import { AuthContext } from "../context/AuthProvider";
 
 import JoinRoom from "../components/JoinRoom/JoinRoom";
@@ -49,26 +49,49 @@ const Lobby = () => {
     setLoginType(e.target.value);
   };
 
+  const logout = e => {
+    if (user) {
+      fetch(`http://localhost:5000/api/logout`, {
+        method: "GET"
+      })
+        .then(response => {
+          if (response.status === 200) setUser(null);
+        })
+        .catch(error => {
+          console.error("Error:", error);
+        });
+    }
+  };
+
   return (
     <div>
       {user ? (
-        <div className="lobby page">
+        <div>
           {!inRoom && (
-            <ToggleButtonGroup
-              color="primary"
-              value={type}
-              exclusive
-              onChange={e => setType(e.target.value)}
-            >
-              <ToggleButton value="join">Join Room</ToggleButton>
-              <ToggleButton value="create">Create Room</ToggleButton>
-            </ToggleButtonGroup>
+            <Box display="flex" justifyContent="flex-end" alignItems="flex-end">
+              <Button variant="contained" color="primary" onClick={logout}>
+                Logout
+              </Button>
+            </Box>
           )}
-          {type === "create" ? (
-            <CreateRoom setInRoom={changeRoom} />
-          ) : (
-            <JoinRoom setInRoom={changeRoom} />
-          )}
+          <div className="lobby page">
+            {!inRoom && (
+              <ToggleButtonGroup
+                color="primary"
+                value={type}
+                exclusive
+                onChange={e => setType(e.target.value)}
+              >
+                <ToggleButton value="join">Join Room</ToggleButton>
+                <ToggleButton value="create">Create Room</ToggleButton>
+              </ToggleButtonGroup>
+            )}
+            {type === "create" ? (
+              <CreateRoom setInRoom={changeRoom} />
+            ) : (
+              <JoinRoom setInRoom={changeRoom} />
+            )}
+          </div>
         </div>
       ) : (
         <div className="lobby page">

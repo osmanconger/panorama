@@ -6,11 +6,19 @@ const userSchema = new mongoose.Schema({
     type: String
   },
   password: {
-    required: true,
+    required: false,
     type: String
   },
   email: {
     required: true,
+    type: String
+  },
+  isLinkedinUser: {
+    required: false,
+    type: Boolean
+  },
+  linkedinId: {
+    required: false,
     type: String
   }
 });

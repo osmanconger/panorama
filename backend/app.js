@@ -40,7 +40,6 @@ const mongoose = require("mongoose");
 const mongoString = process.env.DATABASE_URL;
 const users = require("./models/user");
 const rooms = require("./models/room.js");
-const linkedinUsers = require("./models/linkedinUser");
 
 mongoose.connect(mongoString);
 const database = mongoose.connection;
@@ -144,7 +143,10 @@ app.post("/api/signup/", function(req, res, next) {
   let password = req.body.password;
   let email = req.body.email;
 
-  users.findOne({ username: uname }, function(err3, user) {
+  users.findOne({ isLinkedinUser: false, username: uname }, function(
+    err3,
+    user
+  ) {
     if (err3) return res.status(500).end(err3);
     if (user) {
       return res.status(409).end("username " + uname + " already exists"); // TO DO: check for unique email too
@@ -153,14 +155,19 @@ app.post("/api/signup/", function(req, res, next) {
     const saltRounds = 10;
     bcrypt.hash(password, saltRounds, function(err, hash) {
       // insert user
-      users.create({ username: uname, password: hash, email: email }, function(
-        err2,
-        userCreated
-      ) {
-        if (err2) return res.status(500).end(err2);
-        req.session.user = userCreated;
-        return res.json(uname);
-      });
+      users.create(
+        {
+          isLinkedinUser: false,
+          username: uname,
+          password: hash,
+          email: email
+        },
+        function(err2, userCreated) {
+          if (err2) return res.status(500).end(err2);
+          req.session.user = userCreated;
+          return res.json(uname);
+        }
+      );
     });
   });
 });
@@ -176,7 +183,10 @@ app.post("/api/login", (req, res) => {
   let password = req.body.password;
 
   // retrieve user from the database
-  users.findOne({ username: uname }, function(err, user) {
+  users.findOne({ isLinkedinUser: false, username: uname }, function(
+    err,
+    user
+  ) {
     if (err) return res.status(500).end(err);
     if (!user) return res.status(401).end("access denied");
     let hash = user.password;
@@ -205,6 +215,7 @@ app.get("/api/room/:roomId/participants", (req, res) => {
   });
 });
 
+// initialize linkedin strategy
 passport.use(
   new LinkedInStrategy(
     {
@@ -215,36 +226,41 @@ passport.use(
     },
     function(accessToken, refreshToken, profile, done) {
       process.nextTick(function() {
-        linkedinUsers.findOne({ linkedinId: profile.id }).then(user => {
-          if (user) {
-            //it checks if the user is saved in the database
-            done(null, user);
-          } else {
-            linkedinUsers.create(
-              {
-                linkedinId: profile.id,
-                email: profile.emails[0].value,
-                username: (
-                  profile.name.givenName + profile.name.familyName
-                ).toLowerCase()
-              },
-              function(err2, userCreated) {
-                if (err2) return res.status(500).end(err2);
-                done(null, userCreated);
-              }
-            );
-          }
-        });
+        users
+          .findOne({ isLinkedinUser: true, linkedinId: profile.id })
+          .then(user => {
+            if (user) {
+              //it checks if the user is saved in the database
+              done(null, user);
+            } else {
+              users.create(
+                {
+                  isLinkedinUser: true,
+                  linkedinId: profile.id,
+                  email: profile.emails[0].value,
+                  username: (
+                    profile.name.givenName + profile.name.familyName
+                  ).toLowerCase()
+                },
+                function(err2, userCreated) {
+                  if (err2) return res.status(500).end(err2);
+                  done(null, userCreated);
+                }
+              );
+            }
+          });
       });
     }
   )
 );
 
+// authenticate with linkedin
 app.get("/api/linkedin/auth", passport.authenticate("linkedin"), function(
   req,
   res
 ) {});
 
+// callback function for when authentication is completed
 app.get(
   "/api/linkedin/auth/callback",
   passport.authenticate("linkedin", {
@@ -253,14 +269,16 @@ app.get(
   })
 );
 
+// adds user id to the session
 passport.serializeUser(function(user, done) {
   console.log(`userid:${user._id}`);
   done(null, user._id);
 });
 
+// retrieves the user object
 passport.deserializeUser(function(id, done) {
   console.log(`deserializeid: ${id}`);
-  linkedinUsers.findOne({ _id: id }).then(user => {
+  users.findOne({ isLinkedinUser: true, _id: id }).then(user => {
     if (user) {
       console.log(`deserializeuser: ${user}`);
       done(null, user);
@@ -268,20 +286,30 @@ passport.deserializeUser(function(id, done) {
   });
 });
 
+// retrieve the user details for log in
 app.get("/api/linkedin/auth/success", (req, res) => {
   console.log(req.user);
   if (!req.user) {
     return res.status(401).end("access denied");
   }
-  linkedinUsers.findOne({ _id: req.user._id }, function(err, user) {
+  users.findOne({ isLinkedinUser: true, _id: req.user._id }, function(
+    err,
+    user
+  ) {
     if (err) return res.status(500).end(err);
     if (!user) return res.status(401).end("access denied");
     return res.status(200).json(user);
   });
 });
 
+// redirect for authentication failure
 app.get("/api/linkedin/auth/failure", (req, res) => {
   res.send("Failed to authenticate..");
+});
+
+app.get("/api/logout", (req, res) => {
+  req.session.destroy();
+  return res.status(200).send("logout is successful");
 });
 
 // email stuff
