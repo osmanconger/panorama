@@ -1,0 +1,16 @@
+.form {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  padding: 20px;
+}
+
+.form>* {
+  margin-bottom: 10px;
+}
+
+.linkedinButton {
+  height: 40px;
+  width: 220px;
+}

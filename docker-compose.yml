@@ -8,6 +8,7 @@ services:
       - 3000:3000
     volumes:
       - ./frontend:/app
+      - /app/node_modules
 
   backend:
     container_name: backend
@@ -16,6 +17,7 @@ services:
       - 5000:5000
     volumes:
       - ./backend:/app
+      - /app/node_modules
     depends_on:
       - mongo
 
@@ -25,7 +27,9 @@ services:
     volumes:
       - data:/data/db
     ports:
-      - "27017:27017"
+      - "27018:27017"
 
 volumes:
   data:
+  frontend:
+  backend:
