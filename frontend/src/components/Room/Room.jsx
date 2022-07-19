@@ -21,13 +21,13 @@ const Room = ({ room, id, setRoom }) => {
   const [participantEmails, setParticipantEmails] = useState([]);
 
   useEffect(() => {
-    const addParticipant = (participant) => {
-      setRemoteParticipants((prev) => [...prev, participant]);
+    const addParticipant = participant => {
+      setRemoteParticipants(prev => [...prev, participant]);
     };
 
-    const removeParticipant = (participant) => {
+    const removeParticipant = participant => {
       participant.removeAllListeners();
-      setRemoteParticipants((prev) => prev.filter((p) => p !== participant));
+      setRemoteParticipants(prev => prev.filter(p => p !== participant));
     };
 
     if (room) {
@@ -40,21 +40,21 @@ const Room = ({ room, id, setRoom }) => {
   }, [room]);
 
   const mute = () => {
-    room.localParticipant.audioTracks.forEach((publication) =>
+    room.localParticipant.audioTracks.forEach(publication =>
       publication.track.disable()
     );
     setAudioOn(false);
   };
 
   const unmute = () => {
-    room.localParticipant.audioTracks.forEach((publication) =>
+    room.localParticipant.audioTracks.forEach(publication =>
       publication.track.enable()
     );
     setAudioOn(true);
   };
 
   const startVideo = () => {
-    room.localParticipant.videoTracks.forEach((publication) => {
+    room.localParticipant.videoTracks.forEach(publication => {
       publication.track.enable();
       publication.track.attach();
     });
@@ -62,7 +62,7 @@ const Room = ({ room, id, setRoom }) => {
   };
 
   const stopVideo = () => {
-    room.localParticipant.videoTracks.forEach((publication) => {
+    room.localParticipant.videoTracks.forEach(publication => {
       publication.track.disable();
       publication.track.detach();
     });
@@ -71,7 +71,7 @@ const Room = ({ room, id, setRoom }) => {
 
   const leaveRoom = () => {
     if (room.localParticipant.state === "connected") {
-      room.localParticipant.tracks.forEach((publication) =>
+      room.localParticipant.tracks.forEach(publication =>
         publication.track.stop()
       );
       room.disconnect();
@@ -79,16 +79,16 @@ const Room = ({ room, id, setRoom }) => {
     setRoom(null);
   };
   const sendSummary = () => {
-    fetch(`http://localhost:5000/api/room/${id}/participants`)
-      .then((res) => res.json())
-      .then((json) => {
+    fetch(`http://178.128.227.211:5000/api/room/${id}/participants`)
+      .then(res => res.json())
+      .then(json => {
         const worker = new WorkerBuilder(Worker);
         console.log("here", json.emails);
         const emails = json.emails;
         const names = json.names;
         worker.postMessage({ emails, names });
-        worker.onerror = (err) => err;
-        worker.onmessage = (e) => {
+        worker.onerror = err => err;
+        worker.onmessage = e => {
           console.log(e.data);
           worker.terminate();
         };
@@ -119,7 +119,7 @@ const Room = ({ room, id, setRoom }) => {
             color="primary"
             value={mode}
             exclusive
-            onChange={(e) => setMode(e.target.value)}
+            onChange={e => setMode(e.target.value)}
           >
             <ToggleButton value="vid">Videos</ToggleButton>
             <ToggleButton value="draw">Whiteboard</ToggleButton>
@@ -135,7 +135,7 @@ const Room = ({ room, id, setRoom }) => {
                   audioOn={audioOn}
                 />
               </div>
-              {remoteParticipants.map((participant) => (
+              {remoteParticipants.map(participant => (
                 <div className="participant">
                   <Participant
                     key={participant.sid}

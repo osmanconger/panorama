@@ -13,40 +13,40 @@ const CreateRoom = ({ setInRoom }) => {
   const [token, setToken] = useState(null);
   const [room, setRoom] = useState(null);
 
-  const changeRoom = (room) => {
+  const changeRoom = room => {
     setRoom(room);
   };
 
-  const createRoom = (e) => {
+  const createRoom = e => {
     e.preventDefault();
-    fetch(`http://localhost:5000/api/room/token`, {
+    fetch(`http://178.128.227.211:5000/api/room/token`, {
       method: "POST",
       headers: {
-        "Content-Type": "application/json",
+        "Content-Type": "application/json"
       },
       body: JSON.stringify({
-        identity: user.name,
-      }),
+        identity: user.name
+      })
     })
-      .then((res) => {
+      .then(res => {
         return res.json();
       })
-      .then((json) => {
+      .then(json => {
         setRoomId(json.id);
         setToken(json.token);
       })
-      .catch((err) => console.log(err));
+      .catch(err => console.log(err));
   };
 
   //actually connect to the room
-  const joinRoom = (e) => {
+  const joinRoom = e => {
     e.preventDefault();
     connect(token, { name: roomId })
-      .then((newRoom) => {
+      .then(newRoom => {
         setInRoom(true);
         setRoom(newRoom);
       })
-      .catch((err) => console.log(err));
+      .catch(err => console.log(err));
   };
 
   return (
