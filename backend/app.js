@@ -96,8 +96,6 @@ app.post("/api/room/:roomId/token", (req, res) => {
 
 //Create a new room, return the id and token to access the room
 app.post("/api/room/token", (req, res) => {
-  console.log(req.user);
-
   const roomId = uuid.v4();
   const identity = req.body.identity;
   const token = getVideoToken(identity, roomId);
@@ -204,8 +202,6 @@ app.post("/api/login", (req, res) => {
 app.get("/api/room/:roomId/participants", (req, res) => {
   rooms.findOne({ id: req.params.roomId }, function(err, data) {
     if (err) return res.status(500).end(err);
-    console.log(data.participants);
-    console.log(data.participantEmails);
     return res.send(
       JSON.stringify({
         names: data.participants,
@@ -271,16 +267,13 @@ app.get(
 
 // adds user id to the session
 passport.serializeUser(function(user, done) {
-  console.log(`userid:${user._id}`);
   done(null, user._id);
 });
 
 // retrieves the user object
 passport.deserializeUser(function(id, done) {
-  console.log(`deserializeid: ${id}`);
   users.findOne({ isLinkedinUser: true, _id: id }).then(user => {
     if (user) {
-      console.log(`deserializeuser: ${user}`);
       done(null, user);
     }
   });
@@ -288,7 +281,6 @@ passport.deserializeUser(function(id, done) {
 
 // retrieve the user details for log in
 app.get("/api/linkedin/auth/success", (req, res) => {
-  console.log(req.user);
   if (!req.user) {
     return res.status(401).end("access denied");
   }
@@ -331,7 +323,6 @@ const transporter = nodemailer.createTransport({
 
 app.post("/api/text-mail", function(req, res, next) {
   const { email, html } = req.body;
-  console.log(email);
   const mailData = {
     from: process.env.EMAIL,
     to: email,

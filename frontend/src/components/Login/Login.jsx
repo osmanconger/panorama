@@ -29,7 +29,6 @@ function Login() {
       .then(response => response.json())
       //TODO: Possibly check status is ok before rendering
       .then(json => {
-        console.log(json);
         setUser({ id: json._id, name: json.username });
       })
       .catch(error => {
