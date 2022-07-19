@@ -217,7 +217,8 @@ passport.use(
     {
       clientID: process.env.LINKEDIN_KEY,
       clientSecret: process.env.LINKEDIN_SECRET,
-      callbackURL: "http://localhost:5000/api/linkedin/auth/callback",
+      callbackURL:
+        "http://" + process.env.HOST + ":5000/api/linkedin/auth/callback",
       scope: ["w_member_social", "r_emailaddress", "r_liteprofile"]
     },
     function(accessToken, refreshToken, profile, done) {
@@ -260,7 +261,7 @@ app.get("/api/linkedin/auth", passport.authenticate("linkedin"), function(
 app.get(
   "/api/linkedin/auth/callback",
   passport.authenticate("linkedin", {
-    successRedirect: "http://localhost:3000/",
+    successRedirect: "http://" + process.env.HOST + ":3000/",
     failureRedirect: "/api/linkedin/auth/failure"
   })
 );
