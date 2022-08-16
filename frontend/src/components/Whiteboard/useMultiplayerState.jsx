@@ -1,3 +1,4 @@
+// obtained from https://github.com/nimeshnayaju/yjs-tldraw
 import { TldrawApp } from "@tldraw/tldraw";
 import { useCallback, useEffect, useState } from "react";
 import { Room } from "@y-presence/client";
@@ -9,14 +10,13 @@ export function useMultiplayerState(roomId) {
   const doc = new yjs.Doc();
 
   // Create a websocket provider
-  const provider = new WebsocketProvider(
-    "ws://178.128.227.211:1234",
-    roomId,
-    doc,
-    {
-      connect: true
-    }
-  );
+  const provider = new WebsocketProvider("wss://websocket.panoramas.social", roomId, doc, {
+    connect: true,
+  });
+
+  provider.on("status", event => {
+    console.log(event.status);
+  })
 
   // Export the provider's awareness API
   const awareness = provider.awareness;
@@ -142,6 +142,7 @@ export function useMultiplayerState(roomId) {
   }, [app]);
 
   return {
+    app,
     onMount,
     onChangePage,
     onUndo,

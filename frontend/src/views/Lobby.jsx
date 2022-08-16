@@ -1,9 +1,9 @@
-import { useContext, useState, useEffect } from "react";
-import { ToggleButtonGroup, ToggleButton, Button, Box } from "@mui/material";
+import { Box, Button, ToggleButton, ToggleButtonGroup } from "@mui/material";
+import { useContext, useEffect, useState } from "react";
 import { AuthContext } from "../context/AuthProvider";
 
-import JoinRoom from "../components/JoinRoom/JoinRoom";
 import CreateRoom from "../components/CreateRoom/CreateRoom";
+import JoinRoom from "../components/JoinRoom/JoinRoom";
 import Login from "../components/Login/Login";
 import Signup from "../components/Signup/Signup";
 import "./Lobby.css";
@@ -24,7 +24,7 @@ const Lobby = () => {
   // check if the user has authenticated through linkedin
   useEffect(() => {
     if (!user) {
-      fetch(`http://178.128.227.211:5000/api/linkedin/auth/success`, {
+      fetch(`https://api.panoramas.social/api/linkedin/auth/success`, {
         method: "GET",
         credentials: "include",
         headers: {
@@ -52,7 +52,7 @@ const Lobby = () => {
 
   const logout = e => {
     if (user) {
-      fetch(`http://178.128.227.211:5000/api/logout`, {
+      fetch(`https://api.panoramas.social/api/logout`, {
         method: "GET"
       })
         .then(response => {

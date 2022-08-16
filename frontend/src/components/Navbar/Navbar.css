@@ -1,0 +1,17 @@
+#navbar {
+  display: flex;
+  justify-content: space-between;
+  font-family: "Avenir", "sans-serif";
+  font-size: 15px;
+}
+
+#appbar {
+  z-index: 1400;
+  margin-bottom: 50px;
+}
+
+.nav-right {
+  display: flex;
+  column-gap: 1em;
+  align-items: center;
+}
